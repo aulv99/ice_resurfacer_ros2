@@ -1,0 +1,34 @@
+# Defining Extended Kalman Filter node
+ekf_filter_node:
+  ros__parameters:
+    use_sim_time: true
+    frequency: 30.0
+    two_d_mode: true
+    publish_tf: true
+
+    # Frames
+    map_frame: map
+    odom_frame: odom
+    base_link_frame: base_link
+    world_frame: odom
+
+    # Sensor 1: Wheel Odometry from the Ackermann Controller
+    odom0: /ackermann_steering_controller/odometry
+    # The odometry configuration matrix
+    # [x, y, z, roll, pitch, yaw, vx, vy, vz, vroll, vpitch, vyaw, ax, ay, az]
+    # We only need x, y, vx, vy, vyaw
+    odom0_config: [true,  true,  false,
+                   false, false, false,
+                   true,  true,  false,
+                   false, false, true,
+                   false, false, false]
+
+    # Sensor 2: IMU
+    imu0: /imu
+    # IMU configuration matrix
+    # yaw, vyaw, ax
+    imu0_config: [false, false, false,
+                  false, false, true,
+                  false, false, false,
+                  false, false, true,
+                  true,  false, false]
