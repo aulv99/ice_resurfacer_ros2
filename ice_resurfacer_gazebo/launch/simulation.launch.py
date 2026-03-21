@@ -5,6 +5,8 @@ from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import Command, LaunchConfiguration
 from launch_ros.actions import Node
+from launch.substitutions import PathJoinSubstitution
+from launch_ros.substitutions import FindPackageShare
 
 def generate_launch_description():
     # PATHS
@@ -43,7 +45,9 @@ def generate_launch_description():
         arguments=[
             '-topic', 'robot_description',
             '-name', 'ice_resurfacer',
-            '-z', '2.5'
+            '-z', '2.5',
+            '-y', '13',
+            '-x', '-20'
         ],
         output='screen'
     )
@@ -87,6 +91,23 @@ def generate_launch_description():
         parameters=[ekf_config_path, {'use_sim_time': True}]
     )
 
+    # Nav2 Bringup
+    nav2_params_path = os.path.join(
+        get_package_share_directory('ice_resurfacer_description'),
+        'config',
+        'nav2_params.yaml'
+    )
+    
+    start_nav2_cmd = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            PathJoinSubstitution([FindPackageShare('nav2_bringup'), 'launch', 'navigation_launch.py'])
+        ),
+        launch_arguments={
+            'use_sim_time': 'true',
+            'params_file': nav2_params_path
+        }.items()
+    )
+
     return LaunchDescription([
         gazebo,
         robot_state_publisher,
@@ -94,5 +115,6 @@ def generate_launch_description():
         bridge,
         diff_drive_spawner,  
         ackermann_spawner,    
-        start_ekf_node
+        start_ekf_node,
+        start_nav2_cmd,
     ])
