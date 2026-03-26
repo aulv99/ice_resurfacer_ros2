@@ -9,6 +9,9 @@ controller_manager:
     ackermann_steering_controller:
       type: ackermann_steering_controller/AckermannSteeringController
 
+    conditioner_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+
 ackermann_steering_controller:
   ros__parameters:
     # Frame IDs
@@ -28,3 +31,18 @@ ackermann_steering_controller:
     rear_wheels_radius: 0.4
 
     use_stamped_vel: false
+
+conditioner_controller:
+  ros__parameters:
+    joints:
+      - conditioner_joint
+    command_interfaces:
+      - effort
+    state_interfaces:
+      - position
+      - velocity
+    gains:
+      conditioner_joint:
+        p: 10000.0
+        i: 0.0
+        d: 100.0

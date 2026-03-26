@@ -122,17 +122,19 @@
       <geometry>
         <box size="${cond_len} ${cond_width} ${cond_height}"/>
       </geometry>
-      <material name="red">
+      <material name="black">
         <color rgba="0.8 0.0 0.0 1.0"/>
       </material>
     </visual>
-    <xacro:box_inertia m="200" w="${cond_len}" h="${cond_height}" d="${cond_width}"/>
+    <xacro:box_inertia m="10" w="${cond_len}" h="${cond_height}" d="${cond_width}"/>
   </link>
 
   <joint name="conditioner_joint" type="prismatic">
     <parent link="base_link"/>
     <child link="conditioner_link"/>
-    <origin xyz="${-chassis_len/2 - 0.25} 0 ${-(chassis_height/2) + 0.1}" rpy="0 0 0"/>    <axis xyz="0 0 1"/> <limit lower="0.0" upper="0.5" effort="1000" velocity="0.5"/>
+    <origin xyz="${-chassis_len/2 - 0.25} 0 ${-(chassis_height/2) + 0.1}" rpy="0 0 0"/>    
+    <axis xyz="0 0 -1"/> 
+    <limit lower="0.0" upper="0.5" effort="10000" velocity="0.5"/>
   </joint>
 
   <link name="imu_link"/>
@@ -216,6 +218,7 @@
     </joint>
 
     <joint name="conditioner_joint">
+      <command_interface name="effort"/>
       <state_interface name="position"/>
       <state_interface name="velocity"/>
     </joint>
@@ -231,9 +234,9 @@
     <mu1>2.0</mu1>
     <mu2>20.0</mu2>
     <fdir1>1 0 0</fdir1>
-    <kp>10000000.0</kp> 
-    <kd>1.0</kd>        
-    <minDepth>0.005</minDepth> 
+    <kp>100000.0</kp> 
+    <kd>500.0</kd>        
+    <minDepth>0.01</minDepth> 
     <maxVel>0.1</maxVel>       
   </gazebo>
 
@@ -242,9 +245,9 @@
     <mu1>2.0</mu1>
     <mu2>20.0</mu2>
     <fdir1>1 0 0</fdir1>
-    <kp>10000000.0</kp> 
-    <kd>1.0</kd>        
-    <minDepth>0.005</minDepth> 
+    <kp>100000.0</kp> 
+    <kd>500.0</kd>        
+    <minDepth>0.01</minDepth> 
     <maxVel>0.1</maxVel>       
   </gazebo>
 
@@ -252,9 +255,9 @@
     <mu1>2.0</mu1>
     <mu2>20.0</mu2>
     <fdir1>1 0 0</fdir1> 
-    <kp>10000000.0</kp>
-    <kd>1.0</kd>
-    <minDepth>0.005</minDepth>
+    <kp>100000.0</kp>
+    <kd>500.0</kd>
+    <minDepth>0.01</minDepth>
     <maxVel>0.1</maxVel>      
   </gazebo>
 
@@ -262,9 +265,9 @@
     <mu1>2.0</mu1>
     <mu2>20.0</mu2>
     <fdir1>1 0 0</fdir1>
-    <kp>10000000.0</kp>
-    <kd>1.0</kd>
-    <minDepth>0.005</minDepth>
+    <kp>100000.0</kp>
+    <kd>500.0</kd>
+    <minDepth>0.01</minDepth>
     <maxVel>0.1</maxVel>       
   </gazebo>
 
@@ -301,14 +304,14 @@
       <ray>
         <scan>
           <horizontal>
-            <samples>360</samples>
+            <samples>90</samples>
             <resolution>1.0</resolution>
-            <min_angle>-1.5708</min_angle>
-            <max_angle>1.5708</max_angle>
+            <min_angle>-1.57079</min_angle>
+            <max_angle>1.57079</max_angle>
           </horizontal>
         </scan>
         <range>
-          <min>0.3</min>
+          <min>2.0</min>
           <max>15.0</max>
           <resolution>0.01</resolution>
         </range>

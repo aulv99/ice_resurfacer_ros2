@@ -9,7 +9,7 @@ class SpinalCord(Node):
         self.sub = self.create_subscription(Twist, '/cmd_vel', self.callback, 10)
         # Talk to the Wheels
         self.pub = self.create_publisher(TwistStamped, '/ackermann_steering_controller/reference', 10)
-        self.get_logger().info("Spinal cord online: Translating Nav2 commands to Ackermann wheels!")
+        self.get_logger().info("Translating Nav2 commands to Ackermann wheels")
 
     def callback(self, msg):
         out = TwistStamped()

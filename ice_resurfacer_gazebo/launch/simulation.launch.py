@@ -45,9 +45,9 @@ def generate_launch_description():
         arguments=[
             '-topic', 'robot_description',
             '-name', 'ice_resurfacer',
-            '-z', '2.5',
-            '-y', '13',
-            '-x', '-20'
+            '-z', '1.5',
+            '-y', '0', # 13
+            '-x', '0' # -20
         ],
         output='screen'
     )
@@ -74,6 +74,13 @@ def generate_launch_description():
         package="controller_manager",
         executable="spawner",
         arguments=["ackermann_steering_controller", "--controller-manager", "/controller_manager"],
+    )
+
+    conditioner_spawner = Node(
+        package="controller_manager",
+        executable="spawner",
+        arguments=["conditioner_controller"],
+        output="screen",
     )
 
     ekf_config_path = os.path.join(
@@ -114,7 +121,8 @@ def generate_launch_description():
         spawn_entity,
         bridge,
         diff_drive_spawner,  
-        ackermann_spawner,    
+        ackermann_spawner,
+        conditioner_spawner,    
         start_ekf_node,
         start_nav2_cmd,
     ])

@@ -7,17 +7,24 @@ controller_server:
     
     FollowPath:
       plugin: "nav2_regulated_pure_pursuit_controller::RegulatedPurePursuitController"
-      desired_linear_vel: 1.5           # Cruising speed (m/s)
+      desired_linear_vel: 1.0           # Cruising speed (m/s)
+
       lookahead_dist: 2.0               # How far ahead on the path it looks to steer
       min_lookahead_dist: 1.0
       max_lookahead_dist: 4.0
       lookahead_time: 1.5
       transform_tolerance: 0.1
-      use_velocity_scaled_lookahead_dist: false
-      min_approach_linear_velocity: 0.5
-      approach_velocity_scaling_dist: 1.0
+      use_velocity_scaled_lookahead_dist: true
+      min_approach_linear_velocity: 0.2
+      approach_velocity_scaling_dist: 1.5
       use_collision_detection: true     # Stop if the costmap says a crash is imminent
       max_allowed_time_to_collision_up_to_carrot: 1.0
+
+      use_kinematics: true              # Force it to obey the limits below
+      max_linear_accel: 0.25            # Very slow acceleration (prevents wheel spin)
+      max_linear_decel: 0.25            # Very slow braking (prevents sliding)
+      max_angular_accel: 1.0            # Turn the steering wheel slowly
+      max_angular_vel: 1.5              # Cap the maximum turning speed
 
 # 2. THE LOCAL COSTMAP (The Bumper Zone)
 local_costmap:
