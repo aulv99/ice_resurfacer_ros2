@@ -1,0 +1,7 @@
+image: iihf_rink.pgm
+mode: trinary
+resolution: 0.050
+origin: [-30.333, -15.361, 0]
+negate: 0
+occupied_thresh: 0.65
+free_thresh: 0.196

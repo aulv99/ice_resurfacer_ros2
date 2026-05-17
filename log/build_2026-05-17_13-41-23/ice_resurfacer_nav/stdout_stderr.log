@@ -1,0 +1,25 @@
+-- Install configuration: ""
+-- Execute custom install script
+-- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_nav/share/ice_resurfacer_nav/launch/zamboni_nav.launch.py
+-- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_nav/share/ice_resurfacer_nav/maps/iihf_rink.pgm
+-- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_nav/share/ice_resurfacer_nav/maps/iihf_rink.yaml
+-- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_nav/share/ice_resurfacer_nav/maps/iihf_rink3.pgm
+-- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_nav/share/ice_resurfacer_nav/maps/iihf_rink3.yaml
+-- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_nav/share/ice_resurfacer_nav/maps/iihf_rink4.pgm
+-- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_nav/share/ice_resurfacer_nav/maps/iihf_rink4.yaml
+-- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_nav/share/ice_resurfacer_nav/config/nav2_params.yaml
+-- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_nav/share/ament_index/resource_index/package_run_dependencies/ice_resurfacer_nav
+-- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_nav/share/ament_index/resource_index/parent_prefix_path/ice_resurfacer_nav
+-- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_nav/share/ice_resurfacer_nav/environment/ament_prefix_path.sh
+-- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_nav/share/ice_resurfacer_nav/environment/ament_prefix_path.dsv
+-- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_nav/share/ice_resurfacer_nav/environment/path.sh
+-- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_nav/share/ice_resurfacer_nav/environment/path.dsv
+-- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_nav/share/ice_resurfacer_nav/local_setup.bash
+-- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_nav/share/ice_resurfacer_nav/local_setup.sh
+-- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_nav/share/ice_resurfacer_nav/local_setup.zsh
+-- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_nav/share/ice_resurfacer_nav/local_setup.dsv
+-- Symlinking: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_nav/share/ice_resurfacer_nav/package.dsv
+-- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_nav/share/ament_index/resource_index/packages/ice_resurfacer_nav
+-- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_nav/share/ice_resurfacer_nav/cmake/ice_resurfacer_navConfig.cmake
+-- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_nav/share/ice_resurfacer_nav/cmake/ice_resurfacer_navConfig-version.cmake
+-- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_nav/share/ice_resurfacer_nav/package.xml

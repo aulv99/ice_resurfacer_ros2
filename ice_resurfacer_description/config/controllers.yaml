@@ -37,7 +37,7 @@ conditioner_controller:
     joints:
       - conditioner_joint
     command_interfaces:
-      - effort
+      - position
     state_interfaces:
       - position
       - velocity

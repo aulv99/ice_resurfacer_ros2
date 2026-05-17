@@ -1,0 +1,22 @@
+-- Install configuration: ""
+-- Execute custom install script
+-- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_gazebo/share/ice_resurfacer_gazebo/worlds/ice_rink.sdf
+-- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_gazebo/share/ice_resurfacer_gazebo/launch/simulation.launch.py
+-- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_gazebo/share/ice_resurfacer_gazebo/meshes/hockey_rink.stl
+-- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_gazebo/share/ice_resurfacer_gazebo/meshes/hockey_rink_old.stl
+-- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_gazebo/share/ice_resurfacer_gazebo/meshes/hockey_rink_old2.stl
+-- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_gazebo/share/ament_index/resource_index/package_run_dependencies/ice_resurfacer_gazebo
+-- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_gazebo/share/ament_index/resource_index/parent_prefix_path/ice_resurfacer_gazebo
+-- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_gazebo/share/ice_resurfacer_gazebo/environment/ament_prefix_path.sh
+-- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_gazebo/share/ice_resurfacer_gazebo/environment/ament_prefix_path.dsv
+-- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_gazebo/share/ice_resurfacer_gazebo/environment/path.sh
+-- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_gazebo/share/ice_resurfacer_gazebo/environment/path.dsv
+-- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_gazebo/share/ice_resurfacer_gazebo/local_setup.bash
+-- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_gazebo/share/ice_resurfacer_gazebo/local_setup.sh
+-- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_gazebo/share/ice_resurfacer_gazebo/local_setup.zsh
+-- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_gazebo/share/ice_resurfacer_gazebo/local_setup.dsv
+-- Symlinking: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_gazebo/share/ice_resurfacer_gazebo/package.dsv
+-- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_gazebo/share/ament_index/resource_index/packages/ice_resurfacer_gazebo
+-- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_gazebo/share/ice_resurfacer_gazebo/cmake/ice_resurfacer_gazeboConfig.cmake
+-- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_gazebo/share/ice_resurfacer_gazebo/cmake/ice_resurfacer_gazeboConfig-version.cmake
+-- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_gazebo/share/ice_resurfacer_gazebo/package.xml

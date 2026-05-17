@@ -35,12 +35,41 @@ def main():
     route = []
     
     # This will now actually go to the absolute top-right of the rink!
-    route.append(create_pose(navigator, absolute_x=10.0, absolute_y=7.5, yaw_degrees=-45))
-    route.append(create_pose(navigator, absolute_x=20.0, absolute_y=15.0, yaw_degrees=-90))
+    # route.append(create_pose(navigator, absolute_x=5.0, absolute_y=0.0, yaw_degrees=0))
+    # route.append(create_pose(navigator, absolute_x=7.5, absolute_y=-1.67, yaw_degrees=-22.5))
+    # route.append(create_pose(navigator, absolute_x=10.0, absolute_y=-3.34, yaw_degrees=-45))
+    # route.append(create_pose(navigator, absolute_x=12.5, absolute_y=-5.0, yaw_degrees=-66.6))
+    # route.append(create_pose(navigator, absolute_x=15.0, absolute_y=-6.67, yaw_degrees=-90))
+    # route.append(create_pose(navigator, absolute_x=12.5, absolute_y=-8.34, yaw_degrees=-112.5))
+    # route.append(create_pose(navigator, absolute_x=10.0, absolute_y=-10.0, yaw_degrees=-135))
+    # route.append(create_pose(navigator, absolute_x=7.5, absolute_y=-11.67, yaw_degrees=-157.5))
+    # route.append(create_pose(navigator, absolute_x=5.0, absolute_y=-13.34, yaw_degrees=-180))
+    # route.append(create_pose(navigator, absolute_x=0.0, absolute_y=-13.34, yaw_degrees=-180))
+
+    # drawing a simple curve 
+    # center of the circle
+    center_x = 5.0
+    center_y = -6.67
+    radius = 6.67
+
+    for i in range(7):
+        # Calculate the angle for this specific point (from 90 degrees to -90 degrees)
+        angle_rad = (math.pi / 2) - (i * (math.pi / 10))
+        
+        # Calculate the exact X and Y on the circle's edge
+        arc_x = center_x + (radius * math.cos(angle_rad))
+        arc_y = center_y + (radius * math.sin(angle_rad))
+        
+        # Calculate the robot's facing direction (tangent to the curve)
+        yaw_rad = angle_rad - (math.pi / 2)
+        
+        route.append(create_pose(navigator, arc_x, arc_y, yaw_rad))
+
 
 
     print("Sending absolute coordinate target...")
     navigator.goThroughPoses(route)
+    # navigator.followWaypoints(route)
 
     while not navigator.isTaskComplete():
         feedback = navigator.getFeedback()

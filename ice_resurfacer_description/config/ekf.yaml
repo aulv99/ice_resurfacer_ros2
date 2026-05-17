@@ -13,14 +13,15 @@ ekf_filter_node:
     world_frame: odom
 
     # Sensor 1: Wheel Odometry from the Ackermann Controller
-    odom0: /ackermann_steering_controller/odometry
+    # odom0: /ackermann_steering_controller/odometry 
+    odom0: /ground_truth_pose # temporary ground truth testing
     # The odometry configuration matrix
     # [x, y, z, roll, pitch, yaw, vx, vy, vz, vroll, vpitch, vyaw, ax, ay, az]
     # We only need x, y, vx, vy, vyaw
-    odom0_config: [false,  false,  false,
-                   false, false, false,
-                   true,  false,  false,
+    odom0_config: [true,  true,  false,
                    false, false, true,
+                   false,  false,  false,
+                   false, false, false,
                    false, false, false]
 
     # Sensor 2: IMU

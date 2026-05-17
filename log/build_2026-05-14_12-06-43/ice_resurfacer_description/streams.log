@@ -1,0 +1,25 @@
+[0.086s] Invoking command in '/home/aaro/ice_resurfacer_ws/src/build/ice_resurfacer_description': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/jazzy /usr/bin/cmake --build /home/aaro/ice_resurfacer_ws/src/build/ice_resurfacer_description -- -j16 -l16
+[0.140s] Invoked command in '/home/aaro/ice_resurfacer_ws/src/build/ice_resurfacer_description' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/jazzy /usr/bin/cmake --build /home/aaro/ice_resurfacer_ws/src/build/ice_resurfacer_description -- -j16 -l16
+[0.169s] Invoking command in '/home/aaro/ice_resurfacer_ws/src/build/ice_resurfacer_description': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/jazzy /usr/bin/cmake --install /home/aaro/ice_resurfacer_ws/src/build/ice_resurfacer_description
+[0.175s] -- Install configuration: ""
+[0.176s] -- Execute custom install script
+[0.178s] -- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_description/share/ice_resurfacer_description/launch/visualize.launch.py
+[0.178s] -- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_description/share/ice_resurfacer_description/urdf/ice_resurfacer.urdf.xacro
+[0.179s] -- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_description/share/ice_resurfacer_description/config/controllers.yaml
+[0.179s] -- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_description/share/ice_resurfacer_description/config/ekf.yaml
+[0.180s] -- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_description/share/ament_index/resource_index/package_run_dependencies/ice_resurfacer_description
+[0.180s] -- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_description/share/ament_index/resource_index/parent_prefix_path/ice_resurfacer_description
+[0.180s] -- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_description/share/ice_resurfacer_description/environment/ament_prefix_path.sh
+[0.180s] -- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_description/share/ice_resurfacer_description/environment/ament_prefix_path.dsv
+[0.180s] -- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_description/share/ice_resurfacer_description/environment/path.sh
+[0.180s] -- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_description/share/ice_resurfacer_description/environment/path.dsv
+[0.180s] -- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_description/share/ice_resurfacer_description/local_setup.bash
+[0.180s] -- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_description/share/ice_resurfacer_description/local_setup.sh
+[0.180s] -- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_description/share/ice_resurfacer_description/local_setup.zsh
+[0.181s] -- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_description/share/ice_resurfacer_description/local_setup.dsv
+[0.181s] -- Symlinking: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_description/share/ice_resurfacer_description/package.dsv
+[0.187s] -- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_description/share/ament_index/resource_index/packages/ice_resurfacer_description
+[0.188s] -- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_description/share/ice_resurfacer_description/cmake/ice_resurfacer_descriptionConfig.cmake
+[0.188s] -- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_description/share/ice_resurfacer_description/cmake/ice_resurfacer_descriptionConfig-version.cmake
+[0.188s] -- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_description/share/ice_resurfacer_description/package.xml
+[0.241s] Invoked command in '/home/aaro/ice_resurfacer_ws/src/build/ice_resurfacer_description' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/jazzy /usr/bin/cmake --install /home/aaro/ice_resurfacer_ws/src/build/ice_resurfacer_description

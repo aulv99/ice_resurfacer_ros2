@@ -1,0 +1,46 @@
+[0.052s] Invoking command in '/home/aaro/ice_resurfacer_ws/src/build/ice_resurfacer_description': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/jazzy /usr/bin/cmake /home/aaro/ice_resurfacer_ws/src/ice_resurfacer_description -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_description
+[0.289s] -- The C compiler identification is GNU 13.3.0
+[0.706s] -- The CXX compiler identification is GNU 13.3.0
+[1.106s] -- Detecting C compiler ABI info
+[1.365s] -- Detecting C compiler ABI info - done
+[1.372s] -- Check for working C compiler: /usr/bin/cc - skipped
+[1.372s] -- Detecting C compile features
+[1.373s] -- Detecting C compile features - done
+[1.475s] -- Detecting CXX compiler ABI info
+[1.741s] -- Detecting CXX compiler ABI info - done
+[1.748s] -- Check for working CXX compiler: /usr/bin/c++ - skipped
+[1.748s] -- Detecting CXX compile features
+[1.748s] -- Detecting CXX compile features - done
+[1.776s] -- Found ament_cmake: 2.5.5 (/opt/ros/jazzy/share/ament_cmake/cmake)
+[1.907s] -- Found Python3: /usr/bin/python3 (found version "3.12.3") found components: Interpreter 
+[1.980s] -- Override CMake install command with custom implementation using symlinks instead of copying resources
+[2.106s] -- Configuring done (2.0s)
+[2.109s] -- Generating done (0.0s)
+[2.110s] -- Build files have been written to: /home/aaro/ice_resurfacer_ws/src/build/ice_resurfacer_description
+[2.115s] Invoked command in '/home/aaro/ice_resurfacer_ws/src/build/ice_resurfacer_description' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/jazzy /usr/bin/cmake /home/aaro/ice_resurfacer_ws/src/ice_resurfacer_description -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_description
+[2.117s] Invoking command in '/home/aaro/ice_resurfacer_ws/src/build/ice_resurfacer_description': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/jazzy /usr/bin/cmake --build /home/aaro/ice_resurfacer_ws/src/build/ice_resurfacer_description -- -j16 -l16
+[2.151s] Invoked command in '/home/aaro/ice_resurfacer_ws/src/build/ice_resurfacer_description' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/jazzy /usr/bin/cmake --build /home/aaro/ice_resurfacer_ws/src/build/ice_resurfacer_description -- -j16 -l16
+[2.176s] Invoking command in '/home/aaro/ice_resurfacer_ws/src/build/ice_resurfacer_description': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/jazzy /usr/bin/cmake --install /home/aaro/ice_resurfacer_ws/src/build/ice_resurfacer_description
+[2.181s] -- Install configuration: ""
+[2.181s] -- Execute custom install script
+[2.182s] -- Symlinking: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_description/share/ice_resurfacer_description/launch/visualize.launch.py
+[2.190s] -- Symlinking: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_description/share/ice_resurfacer_description/urdf/ice_resurfacer.urdf.xacro
+[2.196s] -- Symlinking: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_description/share/ice_resurfacer_description/config/controllers.yaml
+[2.204s] -- Symlinking: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_description/share/ice_resurfacer_description/config/ekf.yaml
+[2.210s] -- Symlinking: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_description/share/ice_resurfacer_description/config/nav2_params.yaml
+[2.218s] -- Symlinking: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_description/share/ament_index/resource_index/package_run_dependencies/ice_resurfacer_description
+[2.226s] -- Symlinking: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_description/share/ament_index/resource_index/parent_prefix_path/ice_resurfacer_description
+[2.233s] -- Symlinking: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_description/share/ice_resurfacer_description/environment/ament_prefix_path.sh
+[2.239s] -- Symlinking: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_description/share/ice_resurfacer_description/environment/ament_prefix_path.dsv
+[2.247s] -- Symlinking: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_description/share/ice_resurfacer_description/environment/path.sh
+[2.254s] -- Symlinking: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_description/share/ice_resurfacer_description/environment/path.dsv
+[2.260s] -- Symlinking: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_description/share/ice_resurfacer_description/local_setup.bash
+[2.266s] -- Symlinking: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_description/share/ice_resurfacer_description/local_setup.sh
+[2.272s] -- Symlinking: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_description/share/ice_resurfacer_description/local_setup.zsh
+[2.280s] -- Symlinking: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_description/share/ice_resurfacer_description/local_setup.dsv
+[2.286s] -- Symlinking: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_description/share/ice_resurfacer_description/package.dsv
+[2.293s] -- Symlinking: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_description/share/ament_index/resource_index/packages/ice_resurfacer_description
+[2.300s] -- Symlinking: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_description/share/ice_resurfacer_description/cmake/ice_resurfacer_descriptionConfig.cmake
+[2.306s] -- Symlinking: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_description/share/ice_resurfacer_description/cmake/ice_resurfacer_descriptionConfig-version.cmake
+[2.313s] -- Symlinking: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_description/share/ice_resurfacer_description/package.xml
+[2.323s] Invoked command in '/home/aaro/ice_resurfacer_ws/src/build/ice_resurfacer_description' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/jazzy /usr/bin/cmake --install /home/aaro/ice_resurfacer_ws/src/build/ice_resurfacer_description

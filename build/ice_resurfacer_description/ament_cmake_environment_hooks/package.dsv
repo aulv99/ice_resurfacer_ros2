@@ -1,0 +1,4 @@
+source;share/ice_resurfacer_description/local_setup.bash
+source;share/ice_resurfacer_description/local_setup.dsv
+source;share/ice_resurfacer_description/local_setup.sh
+source;share/ice_resurfacer_description/local_setup.zsh

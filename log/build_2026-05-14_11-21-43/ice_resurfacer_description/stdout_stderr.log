@@ -1,0 +1,21 @@
+-- Install configuration: ""
+-- Execute custom install script
+-- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_description/share/ice_resurfacer_description/launch/visualize.launch.py
+-- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_description/share/ice_resurfacer_description/urdf/ice_resurfacer.urdf.xacro
+-- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_description/share/ice_resurfacer_description/config/controllers.yaml
+-- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_description/share/ice_resurfacer_description/config/ekf.yaml
+-- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_description/share/ament_index/resource_index/package_run_dependencies/ice_resurfacer_description
+-- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_description/share/ament_index/resource_index/parent_prefix_path/ice_resurfacer_description
+-- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_description/share/ice_resurfacer_description/environment/ament_prefix_path.sh
+-- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_description/share/ice_resurfacer_description/environment/ament_prefix_path.dsv
+-- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_description/share/ice_resurfacer_description/environment/path.sh
+-- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_description/share/ice_resurfacer_description/environment/path.dsv
+-- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_description/share/ice_resurfacer_description/local_setup.bash
+-- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_description/share/ice_resurfacer_description/local_setup.sh
+-- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_description/share/ice_resurfacer_description/local_setup.zsh
+-- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_description/share/ice_resurfacer_description/local_setup.dsv
+-- Symlinking: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_description/share/ice_resurfacer_description/package.dsv
+-- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_description/share/ament_index/resource_index/packages/ice_resurfacer_description
+-- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_description/share/ice_resurfacer_description/cmake/ice_resurfacer_descriptionConfig.cmake
+-- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_description/share/ice_resurfacer_description/cmake/ice_resurfacer_descriptionConfig-version.cmake
+-- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_description/share/ice_resurfacer_description/package.xml

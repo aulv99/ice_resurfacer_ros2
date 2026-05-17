@@ -20,7 +20,7 @@ def generate_launch_description():
         PythonLaunchDescriptionSource(
             os.path.join(pkg_ros_gz_sim, 'launch', 'gz_sim.launch.py')
         ),
-        launch_arguments={'gz_args': '-r ' + os.path.join(pkg_ice_gazebo, 'worlds', 'ice_rink.sdf')}.items(),
+        launch_arguments={'gz_args': '-s -r ' + os.path.join(pkg_ice_gazebo, 'worlds', 'ice_rink.sdf')}.items(),
     )
 
     # ROBOT DESCRIPTION (XACRO -> URDF)
@@ -100,7 +100,7 @@ def generate_launch_description():
 
     # Nav2 Bringup
     nav2_params_path = os.path.join(
-        get_package_share_directory('ice_resurfacer_description'),
+        get_package_share_directory('ice_resurfacer_nav'),
         'config',
         'nav2_params.yaml'
     )

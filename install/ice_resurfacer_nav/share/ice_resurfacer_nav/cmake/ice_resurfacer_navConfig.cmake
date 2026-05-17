@@ -1,0 +1,1 @@
+/home/aaro/ice_resurfacer_ws/src/build/ice_resurfacer_nav/ament_cmake_core/ice_resurfacer_navConfig.cmake

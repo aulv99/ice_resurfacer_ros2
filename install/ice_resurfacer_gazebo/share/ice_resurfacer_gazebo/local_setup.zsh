@@ -1,0 +1,1 @@
+/home/aaro/ice_resurfacer_ws/src/build/ice_resurfacer_gazebo/ament_cmake_environment_hooks/local_setup.zsh

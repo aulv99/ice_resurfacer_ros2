@@ -1,0 +1,30 @@
+-- Found ament_cmake: 2.5.5 (/opt/ros/jazzy/share/ament_cmake/cmake)
+-- Override CMake install command with custom implementation using symlinks instead of copying resources
+-- Configuring done (0.3s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/aaro/ice_resurfacer_ws/src/build/ice_resurfacer_nav
+-- Install configuration: ""
+-- Execute custom install script
+-- Symlinking: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_nav/share/ice_resurfacer_nav/launch/zamboni_nav.launch.py
+-- Symlinking: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_nav/share/ice_resurfacer_nav/maps/iihf_rink.pgm
+-- Symlinking: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_nav/share/ice_resurfacer_nav/maps/iihf_rink.yaml
+-- Symlinking: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_nav/share/ice_resurfacer_nav/maps/iihf_rink3.pgm
+-- Symlinking: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_nav/share/ice_resurfacer_nav/maps/iihf_rink3.yaml
+-- Symlinking: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_nav/share/ice_resurfacer_nav/maps/iihf_rink4.pgm
+-- Symlinking: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_nav/share/ice_resurfacer_nav/maps/iihf_rink4.yaml
+-- Symlinking: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_nav/share/ice_resurfacer_nav/config/nav2_params.yaml
+-- Symlinking: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_nav/share/ament_index/resource_index/package_run_dependencies/ice_resurfacer_nav
+-- Symlinking: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_nav/share/ament_index/resource_index/parent_prefix_path/ice_resurfacer_nav
+-- Symlinking: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_nav/share/ice_resurfacer_nav/environment/ament_prefix_path.sh
+-- Symlinking: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_nav/share/ice_resurfacer_nav/environment/ament_prefix_path.dsv
+-- Symlinking: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_nav/share/ice_resurfacer_nav/environment/path.sh
+-- Symlinking: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_nav/share/ice_resurfacer_nav/environment/path.dsv
+-- Symlinking: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_nav/share/ice_resurfacer_nav/local_setup.bash
+-- Symlinking: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_nav/share/ice_resurfacer_nav/local_setup.sh
+-- Symlinking: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_nav/share/ice_resurfacer_nav/local_setup.zsh
+-- Symlinking: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_nav/share/ice_resurfacer_nav/local_setup.dsv
+-- Symlinking: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_nav/share/ice_resurfacer_nav/package.dsv
+-- Symlinking: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_nav/share/ament_index/resource_index/packages/ice_resurfacer_nav
+-- Symlinking: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_nav/share/ice_resurfacer_nav/cmake/ice_resurfacer_navConfig.cmake
+-- Symlinking: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_nav/share/ice_resurfacer_nav/cmake/ice_resurfacer_navConfig-version.cmake
+-- Symlinking: /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_nav/share/ice_resurfacer_nav/package.xml

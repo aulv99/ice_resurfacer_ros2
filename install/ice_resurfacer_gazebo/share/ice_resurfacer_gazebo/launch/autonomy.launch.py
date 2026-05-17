@@ -1,0 +1,1 @@
+/home/aaro/ice_resurfacer_ws/src/ice_resurfacer_gazebo/launch/autonomy.launch.py
