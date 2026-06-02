@@ -17,7 +17,7 @@ controller_server:
       use_velocity_scaled_lookahead_dist: true
       min_approach_linear_velocity: 0.2
       approach_velocity_scaling_dist: 1.5
-      use_collision_detection: true     # Stop if the costmap says a crash is imminent
+      use_collision_detection: false    # Stop if the costmap says a crash is imminent
       max_allowed_time_to_collision_up_to_carrot: 1.0
 
       use_kinematics: true              # Force it to obey the limits below
@@ -56,7 +56,7 @@ local_costmap:
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
         cost_scaling_factor: 3.0
-        inflation_radius: 2.0  # CHANGED FROM 1.0 TO 2.0
+        inflation_radius: 0.0  # CHANGED FROM 1.0 TO 2.0
 
 # 3. THE GLOBAL COSTMAP (For the Planner)
 global_costmap:
@@ -89,7 +89,7 @@ global_costmap:
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
         cost_scaling_factor: 3.0
-        inflation_radius: 2.0
+        inflation_radius: 0.0
 
 collision_monitor:
   ros__parameters:
