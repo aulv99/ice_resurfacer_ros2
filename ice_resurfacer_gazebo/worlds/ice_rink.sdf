@@ -83,7 +83,7 @@
         <visual name="visual">
           <geometry>
             <mesh>
-              <uri>model://ice_resurfacer_gazebo/meshes/hockey_rink.stl</uri>
+              <uri>model://ice_resurfacer_gazebo/meshes/ice_hockey_rink5.stl</uri>
               <scale>1 1 1</scale> </mesh>
           </geometry>
           <material>
@@ -95,7 +95,7 @@
         <collision name="collision">
           <geometry>
             <mesh>
-              <uri>model://ice_resurfacer_gazebo/meshes/hockey_rink.stl</uri>
+              <uri>model://ice_resurfacer_gazebo/meshes/ice_hockey_rink5.stl</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>

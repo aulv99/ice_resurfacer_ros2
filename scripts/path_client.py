@@ -169,8 +169,8 @@ def get_zamboni_coordinates():
     cx_sweep6, cy_sweep6 = get_shifting_sweep_points(offset=10.0, is_last_lap=True, is_first_lap=False)
     
     # 3. STITCH THEM ALL TOGETHER
-    cx_total = cx1 + cx2 + cx_sweep1 + cx_sweep2 + cx_sweep3 + cx_sweep4 + cx_sweep5 + cx_sweep6 
-    cy_total = cy1 + cy2 + cy_sweep1 + cy_sweep2 + cy_sweep3 + cy_sweep4 + cy_sweep5 + cy_sweep6 
+    cx_total = cx2 + cx_sweep1 + cx_sweep2 + cx_sweep3 + cx_sweep4 + cx_sweep5 + cx_sweep6 
+    cy_total = cy2 + cy_sweep1 + cy_sweep2 + cy_sweep3 + cy_sweep4 + cy_sweep5 + cy_sweep6 
 
     # 4. Generate the single spline trajectory
     tck, u = splprep([cx_total, cy_total], s=0, k=2)

@@ -14,6 +14,12 @@ def generate_launch_description():
     pkg_ice_gazebo = get_package_share_directory('ice_resurfacer_gazebo')
     pkg_ice_description = get_package_share_directory('ice_resurfacer_description')
     pkg_ice_nav = get_package_share_directory('ice_resurfacer_nav') 
+    gazebo_resource_path = os.path.dirname(pkg_ice_description)
+
+    if 'GZ_SIM_RESOURCE_PATH' in os.environ:
+        os.environ['GZ_SIM_RESOURCE_PATH'] += os.path.pathsep + gazebo_resource_path
+    else:
+        os.environ['GZ_SIM_RESOURCE_PATH'] = gazebo_resource_path
 
     # GAZEBO SIMULATION (Running headless with '-s')
     gazebo = IncludeLaunchDescription(
@@ -24,7 +30,7 @@ def generate_launch_description():
     )
 
     # ROBOT DESCRIPTION
-    xacro_file = os.path.join(pkg_ice_description, 'urdf', 'ice_resurfacer.urdf.xacro')
+    xacro_file = os.path.join(pkg_ice_description, 'urdf', 'ice_resurfacer2.urdf.xacro')
     robot_desc = Command(['xacro ', xacro_file])
 
     robot_state_publisher = Node(

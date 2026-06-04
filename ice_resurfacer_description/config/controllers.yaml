@@ -24,11 +24,11 @@ ackermann_steering_controller:
     front_wheels_names: [front_left_steering_joint, front_right_steering_joint]
 
     # Geometry
-    wheelbase: 2.4       # Distance front-to-back
-    front_wheel_track: 1.6 # Distance left-to-right
-    rear_wheel_track: 1.6
-    front_wheels_radius: 0.4
-    rear_wheels_radius: 0.4
+    wheelbase: 1.96       # 1.16 - (-0.80)
+    front_wheel_track: 1.37 # 0.685 * 2
+    rear_wheel_track: 1.37
+    front_wheels_radius: 0.386
+    rear_wheels_radius: 0.386
 
     use_stamped_vel: false
 
