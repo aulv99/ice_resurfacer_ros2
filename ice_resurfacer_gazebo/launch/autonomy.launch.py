@@ -49,8 +49,8 @@ def generate_launch_description():
             '-topic', 'robot_description',
             '-name', 'ice_resurfacer',
             '-z', '1.5',
-            '-y', '0', 
-            '-x', '0' 
+            '-y', '-11', 
+            '-x', '-34' 
         ],
         output='screen'
     )
