@@ -24,7 +24,7 @@ controller_server:
       max_linear_accel: 0.25            # Very slow acceleration (prevents wheel spin)
       max_linear_decel: 0.25            # Very slow braking (prevents sliding)
       max_angular_accel: 1.0            # Turn the steering wheel slowly
-      max_angular_vel: 1.25              # Cap the maximum turning speed
+      max_angular_vel: 1.50              # Cap the maximum turning speed
 
 # 2. THE LOCAL COSTMAP (The Bumper Zone)
 local_costmap:
@@ -178,7 +178,7 @@ velocity_smoother:
     smoothing_frequency: 20.0
     scale_velocities: False
     feedback: "OPEN_LOOP"
-    max_velocity: [2.0, 0.0, 1.25]  # [x (m/s), y (m/s), theta (rad/s)] - Set to match your controller!
+    max_velocity: [2.0, 0.0, 1.5]  # [x (m/s), y (m/s), theta (rad/s)] - Set to match your controller!
     min_velocity: [-0.5, 0.0, -1.25]
     max_accel: [0.25, 0.0, 1.0]     # Match these to your max_linear_accel and max_angular_accel
     max_decel: [-0.25, 0.0, -1.0]
