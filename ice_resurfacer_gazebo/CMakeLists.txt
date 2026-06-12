@@ -7,7 +7,7 @@ endif()
 
 find_package(ament_cmake REQUIRED)
 
-install(DIRECTORY worlds launch meshes  
+install(DIRECTORY worlds launch meshes materials 
   DESTINATION share/${PROJECT_NAME}
 )
 
