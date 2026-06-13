@@ -6,11 +6,13 @@
       <grid>false</grid>
     </scene>
     
+    <!-- https://gazebosim.org/docs/latest/sdf_worlds/#physics -->
     <physics name="1ms" type="ignored">
       <max_step_size>0.001</max_step_size>
       <real_time_factor>1.0</real_time_factor>
     </physics>
 
+    <!-- https://gazebosim.org/docs/latest/sdf_worlds/#plugins -->
     <plugin
       filename="gz-sim-physics-system"
       name="gz::sim::systems::Physics">
@@ -44,15 +46,15 @@
       <direction>-0.5 0.1 -0.9</direction>
     </light>
 
-   <model name="ground_plane">
+    <!-- Defining ground plane as a sheet of ice with friction coefficient 0.01 -->
+    <model name="ground_plane">
       <static>true</static>
       <link name="link">
         <collision name="collision">
           <geometry>
             <plane>
               <normal>0 0 1</normal>
-              <size>60 30</size>
-            </plane>
+              <size>60 30</size> </plane>
           </geometry>
           <surface>
             <friction>
@@ -67,20 +69,12 @@
           <geometry>
             <plane>
               <normal>0 0 1</normal>
-              <size>60 30</size> 
+              <size>60 30</size>
             </plane>
           </geometry>
           <material>
-            <ambient>1.0 1.0 1.0 1.0</ambient>
-            <diffuse>1.0 1.0 1.0 1.0</diffuse>
-            <specular>0.5 0.5 0.5 1.0</specular>
-            <pbr>
-              <metal>
-                <albedo_map>model://ice_resurfacer_gazebo/materials/textures/Hockeyrink_IIHF.png</albedo_map>
-                <roughness>0.1</roughness> 
-                <metalness>0.0</metalness>
-              </metal>
-            </pbr>
+            <ambient>0.8 0.9 1.0 1</ambient> <diffuse>0.8 0.9 1.0 1</diffuse>
+            <specular>0.1 0.1 0.1 1</specular>
           </material>
         </visual>
       </link>
@@ -88,93 +82,28 @@
 
     <model name="rink_mesh">
       <static>true</static>
-      <pose>0 0 0 0 0 0</pose> 
-      <link name="link">
+      <pose>0 0 0 0 0 0</pose> <link name="link">
         
-        <visual name="rink_visual">
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>model://ice_resurfacer_gazebo/meshes/just_rink_20260612.stl</uri>
+              <scale>1 1 1</scale> </mesh>
+          </geometry>
+          <material>
+            <ambient>1 1 1 1</ambient>
+            <diffuse>1 1 1 1</diffuse>
+          </material>
+        </visual>
+
+        <collision name="collision">
           <geometry>
             <mesh>
               <uri>model://ice_resurfacer_gazebo/meshes/just_rink_20260612.stl</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
-          <material>
-            <ambient>1.0 1.0 1.0 1.0</ambient>
-            <diffuse>1.0 1.0 1.0 1.0</diffuse>
-          </material>
-        </visual>
-        <collision name="rink_collision">
-          <geometry>
-            <mesh>
-              <uri>model://ice_resurfacer_gazebo/meshes/just_rink_20260612.stl</uri>
-              <scale>1 1 1</scale>
-            </mesh>
-          </geometry>
         </collision>
-
-        <visual name="board_top_visual">
-          <geometry>
-            <mesh>
-              <uri>model://ice_resurfacer_gazebo/meshes/top_of_board_20260612.stl</uri>
-              <scale>1 1 1</scale>
-            </mesh>
-          </geometry>
-          <material>
-            <ambient>0.1 0.1 0.8 1.0</ambient>
-            <diffuse>0.1 0.1 0.8 1.0</diffuse>
-          </material>
-        </visual>
-        <collision name="board_top_collision">
-          <geometry>
-            <mesh>
-              <uri>model://ice_resurfacer_gazebo/meshes/top_of_board_20260612.stl</uri>
-              <scale>1 1 1</scale>
-            </mesh>
-          </geometry>
-        </collision>
-
-        <visual name="goal_visual">
-          <geometry>
-            <mesh>
-              <uri>model://ice_resurfacer_gazebo/meshes/just_goal_20260612.stl</uri>
-              <scale>1 1 1</scale>
-            </mesh>
-          </geometry>
-          <material>
-            <ambient>0.8 0.1 0.1 1.0</ambient>
-            <diffuse>0.8 0.1 0.1 1.0</diffuse>
-          </material>
-        </visual>
-        <collision name="goal_collision">
-          <geometry>
-            <mesh>
-              <uri>model://ice_resurfacer_gazebo/meshes/just_goal_20260612.stl</uri>
-              <scale>1 1 1</scale>
-            </mesh>
-          </geometry>
-        </collision>
-
-        <visual name="goal2_visual">
-          <geometry>
-            <mesh>
-              <uri>model://ice_resurfacer_gazebo/meshes/goal_2_20260612.stl</uri>
-              <scale>1 1 1</scale>
-            </mesh>
-          </geometry>
-          <material>
-            <ambient>0.8 0.1 0.1 1.0</ambient>
-            <diffuse>0.8 0.1 0.1 1.0</diffuse>
-          </material>
-        </visual>
-        <collision name="goal2_collision">
-          <geometry>
-            <mesh>
-              <uri>model://ice_resurfacer_gazebo/meshes/goal_2_20260612.stl</uri>
-              <scale>1 1 1</scale>
-            </mesh>
-          </geometry>
-        </collision>
-
       </link>
     </model>
   </world>

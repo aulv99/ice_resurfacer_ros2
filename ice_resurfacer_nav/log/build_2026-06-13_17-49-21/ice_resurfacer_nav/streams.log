@@ -1,0 +1,36 @@
+[0.065s] Invoking command in '/home/aaro/ice_resurfacer_ws/src/ice_resurfacer_nav/build/ice_resurfacer_nav': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/jazzy /usr/bin/cmake --build /home/aaro/ice_resurfacer_ws/src/ice_resurfacer_nav/build/ice_resurfacer_nav -- -j16 -l16
+[0.092s] Invoked command in '/home/aaro/ice_resurfacer_ws/src/ice_resurfacer_nav/build/ice_resurfacer_nav' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/jazzy /usr/bin/cmake --build /home/aaro/ice_resurfacer_ws/src/ice_resurfacer_nav/build/ice_resurfacer_nav -- -j16 -l16
+[0.114s] Invoking command in '/home/aaro/ice_resurfacer_ws/src/ice_resurfacer_nav/build/ice_resurfacer_nav': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/jazzy /usr/bin/cmake --install /home/aaro/ice_resurfacer_ws/src/ice_resurfacer_nav/build/ice_resurfacer_nav
+[0.120s] -- Install configuration: ""
+[0.120s] -- Execute custom install script
+[0.120s] -- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/ice_resurfacer_nav/install/ice_resurfacer_nav/share/ice_resurfacer_nav/launch/zamboni_nav.launch.py
+[0.121s] -- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/ice_resurfacer_nav/install/ice_resurfacer_nav/share/ice_resurfacer_nav/maps/iihf_rink.pgm
+[0.121s] -- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/ice_resurfacer_nav/install/ice_resurfacer_nav/share/ice_resurfacer_nav/maps/iihf_rink.yaml
+[0.121s] -- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/ice_resurfacer_nav/install/ice_resurfacer_nav/share/ice_resurfacer_nav/maps/iihf_rink3.pgm
+[0.121s] -- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/ice_resurfacer_nav/install/ice_resurfacer_nav/share/ice_resurfacer_nav/maps/iihf_rink3.yaml
+[0.121s] -- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/ice_resurfacer_nav/install/ice_resurfacer_nav/share/ice_resurfacer_nav/maps/iihf_rink4.pgm
+[0.121s] -- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/ice_resurfacer_nav/install/ice_resurfacer_nav/share/ice_resurfacer_nav/maps/iihf_rink4.yaml
+[0.121s] -- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/ice_resurfacer_nav/install/ice_resurfacer_nav/share/ice_resurfacer_nav/maps/iihf_rink5.pgm
+[0.121s] -- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/ice_resurfacer_nav/install/ice_resurfacer_nav/share/ice_resurfacer_nav/maps/iihf_rink5.yaml
+[0.121s] -- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/ice_resurfacer_nav/install/ice_resurfacer_nav/share/ice_resurfacer_nav/maps/iihf_rink6.pgm
+[0.122s] -- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/ice_resurfacer_nav/install/ice_resurfacer_nav/share/ice_resurfacer_nav/maps/iihf_rink6.yaml
+[0.122s] -- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/ice_resurfacer_nav/install/ice_resurfacer_nav/share/ice_resurfacer_nav/maps/iihf_rink7.pgm
+[0.122s] -- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/ice_resurfacer_nav/install/ice_resurfacer_nav/share/ice_resurfacer_nav/maps/iihf_rink7.yaml
+[0.122s] -- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/ice_resurfacer_nav/install/ice_resurfacer_nav/share/ice_resurfacer_nav/config/nav2_params.yaml
+[0.122s] -- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/ice_resurfacer_nav/install/ice_resurfacer_nav/share/ice_resurfacer_nav/config/navigate_to_pose_ackermann.xml
+[0.122s] -- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/ice_resurfacer_nav/install/ice_resurfacer_nav/share/ament_index/resource_index/package_run_dependencies/ice_resurfacer_nav
+[0.122s] -- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/ice_resurfacer_nav/install/ice_resurfacer_nav/share/ament_index/resource_index/parent_prefix_path/ice_resurfacer_nav
+[0.122s] -- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/ice_resurfacer_nav/install/ice_resurfacer_nav/share/ice_resurfacer_nav/environment/ament_prefix_path.sh
+[0.122s] -- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/ice_resurfacer_nav/install/ice_resurfacer_nav/share/ice_resurfacer_nav/environment/ament_prefix_path.dsv
+[0.122s] -- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/ice_resurfacer_nav/install/ice_resurfacer_nav/share/ice_resurfacer_nav/environment/path.sh
+[0.123s] -- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/ice_resurfacer_nav/install/ice_resurfacer_nav/share/ice_resurfacer_nav/environment/path.dsv
+[0.123s] -- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/ice_resurfacer_nav/install/ice_resurfacer_nav/share/ice_resurfacer_nav/local_setup.bash
+[0.123s] -- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/ice_resurfacer_nav/install/ice_resurfacer_nav/share/ice_resurfacer_nav/local_setup.sh
+[0.123s] -- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/ice_resurfacer_nav/install/ice_resurfacer_nav/share/ice_resurfacer_nav/local_setup.zsh
+[0.123s] -- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/ice_resurfacer_nav/install/ice_resurfacer_nav/share/ice_resurfacer_nav/local_setup.dsv
+[0.123s] -- Symlinking: /home/aaro/ice_resurfacer_ws/src/ice_resurfacer_nav/install/ice_resurfacer_nav/share/ice_resurfacer_nav/package.dsv
+[0.130s] -- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/ice_resurfacer_nav/install/ice_resurfacer_nav/share/ament_index/resource_index/packages/ice_resurfacer_nav
+[0.131s] -- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/ice_resurfacer_nav/install/ice_resurfacer_nav/share/ice_resurfacer_nav/cmake/ice_resurfacer_navConfig.cmake
+[0.131s] -- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/ice_resurfacer_nav/install/ice_resurfacer_nav/share/ice_resurfacer_nav/cmake/ice_resurfacer_navConfig-version.cmake
+[0.131s] -- Up-to-date symlink: /home/aaro/ice_resurfacer_ws/src/ice_resurfacer_nav/install/ice_resurfacer_nav/share/ice_resurfacer_nav/package.xml
+[0.132s] Invoked command in '/home/aaro/ice_resurfacer_ws/src/ice_resurfacer_nav/build/ice_resurfacer_nav' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/jazzy /usr/bin/cmake --install /home/aaro/ice_resurfacer_ws/src/ice_resurfacer_nav/build/ice_resurfacer_nav

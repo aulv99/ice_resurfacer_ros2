@@ -308,7 +308,7 @@ def generate_zamboni_path():
         y_top_start=y_sweep_top_start,        
         y_bottom_start=-10.4,       
         lane_spacing=LANE_SPACING,       
-        num_passes=7            
+        num_passes=6            
     )
     
     px.extend(sweep_x); py.extend(sweep_y); pv.extend(sweep_v)

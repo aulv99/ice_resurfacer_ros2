@@ -49,8 +49,8 @@ def generate_launch_description():
             '-topic', 'robot_description',
             '-name', 'ice_resurfacer',
             '-z', '1.5',
-            '-y', '-11', 
-            '-x', '-34' 
+            '-y', '-10.25', 
+            '-x', '-32.0' 
         ],
         output='screen'
     )
@@ -88,7 +88,7 @@ def generate_launch_description():
         package='nav2_map_server',
         executable='map_server',
         name='map_server',
-        parameters=[{'yaml_filename': os.path.join(pkg_ice_nav, 'maps', 'iihf_rink4.yaml')}]
+        parameters=[{'yaml_filename': os.path.join(pkg_ice_nav, 'maps', 'iihf_rink8.yaml')}]
     )
     
     lifecycle_manager_map = Node(
