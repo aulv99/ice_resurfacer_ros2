@@ -33,6 +33,9 @@ controller_server:
       max_angular_accel: 1.0            # Turn the steering wheel slowly
       max_angular_vel: 1.50              # Cap the maximum turning speed
 
+      use_interpolation: false
+      max_robot_pose_search_dist: 5.0
+
 # 2. THE LOCAL COSTMAP (The Bumper Zone)
 local_costmap:
   local_costmap:
