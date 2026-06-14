@@ -113,6 +113,43 @@ def generate_wall_to_sweep_transition(x_wall, y_sweep_top, x_sweep_start):
     
     return x, y, v, y_wall_end
 
+def generate_staging_alignment(staging_x, staging_y, target_x, target_y):
+    x, y, v = [], [], []
+    
+    # 1. THE STABILIZATION STRAIGHT (The Runway)
+    # Give Pure Pursuit 14 meters to fix Nav2's sloppy angle before turning
+    u_turn_start_x = 0.0
+    if staging_x < u_turn_start_x:
+        sx, sy = sample_line((staging_x, staging_y), (u_turn_start_x, staging_y))
+        append_segment(x, y, v, sx, sy, SWEEP_STRAIGHT_SPEED)
+    else:
+        u_turn_start_x = staging_x
+        
+    # 2. THE SAFE, SHALLOW U-TURN
+    # We stop the turn at Y = -10.0 so the tail swing cannot hit the boards
+    u_turn_end_y = -12.5
+    radius = abs(staging_y - u_turn_end_y) / 2.0
+    center_x = u_turn_start_x
+    center_y = (staging_y + u_turn_end_y) / 2.0
+    
+    # Clockwise arc from Top (pi/2) to Bottom (-pi/2)
+    sx, sy = sample_arc((center_x, center_y), radius, math.pi/2, -math.pi/2)
+    append_segment(x, y, v, sx, sy, SWEEP_CORNER_SPEED)
+    
+    # 3. THE GLIDE (Cosine Lane Change)
+    # Smoothly drift from Y = -10.0 down to the Lap 0 rail (-13.88) heading West
+    tx, ty = generate_wall_lane_change_horizontal(
+        start_x=u_turn_start_x, 
+        end_x=target_x, 
+        start_y=u_turn_end_y, 
+        end_y=target_y,
+        n_points=60  # Dense points for a buttery smooth glide
+    )
+    # It is safe to use straight speed here because the lane change is so gentle
+    append_segment(x, y, v, tx, ty, WALL_STRAIGHT_SPEED)
+    
+    return x, y, v
+
 # ============================================================
 # SWEEP GENERATOR
 # ============================================================
@@ -194,6 +231,7 @@ def generate_full_wall_lap_bottom(offset_straight, offset_corner, start_x, end_x
 def generate_zamboni_path():
     px, py, pv = [], [], []
 
+    # THE DYNAMIC MARGINS
     margin_straight = 0.05
     margin_corner = 0.12
     first_offset_straight = CONDITIONER_WIDTH/2 + margin_straight
@@ -204,9 +242,29 @@ def generate_zamboni_path():
     cy_tl = 15.0 - CORNER_RADIUS
     cy_bl = -15.0 + CORNER_RADIUS
 
+    # Calculate exact Y coordinate of your Lap 0 starting rail
     lap0_start_x = -10.0
     lap0_end_x = -10.0
+    lap0_start_y = -15.0 + first_offset_straight 
+
+    # ==========================================
+    # 0. STAGING ALIGNMENT (The 180 Drop-In)
+    # ==========================================
+    # This seamlessly bridges the Nav2 staging point to the Lap 0 rails
+    staging_x = -14.0
+    staging_y = 0.0
     
+    tx0, ty0, tv0 = generate_staging_alignment(
+        staging_x=staging_x, 
+        staging_y=staging_y, 
+        target_x=lap0_start_x, 
+        target_y=lap0_start_y
+    )
+    px.extend(tx0); py.extend(ty0); pv.extend(tv0)
+
+    # ==========================================
+    # 1. LAP 0 (The Outer Lap)
+    # ==========================================
     lx0, ly0, lv0 = generate_full_wall_lap_bottom(
         offset_straight=first_offset_straight, 
         offset_corner=first_offset_corner, 
@@ -323,9 +381,9 @@ class ZamboniMissionNode(Node):
 
         # Calculate exact target start pose based on your custom generator offsets
         margin_straight = 0.05
-        target_x = -10.0
+        target_x = -14.0
         # target_y = -15.0 + (CONDITIONER_WIDTH / 2.0) + margin_straight
-        target_y = -10.0
+        target_y = -0.5
 
         goal_msg = NavigateToPose.Goal()
         goal_msg.pose.header.frame_id = 'map'
@@ -335,10 +393,10 @@ class ZamboniMissionNode(Node):
         goal_msg.pose.pose.position.y = float(target_y)
         goal_msg.pose.pose.position.z = 0.0
         
-        # Facing West
-        goal_msg.pose.pose.orientation = get_quaternion_from_yaw(math.pi)
+        # Facing East
+        goal_msg.pose.pose.orientation = get_quaternion_from_yaw(0.0)
 
-        self.get_logger().info(f'Target start pose: X={target_x:.2f}, Y={target_y:.2f}, Yaw=180°')
+        self.get_logger().info(f'Target start pose: X={target_x:.2f}, Y={target_y:.2f}, Yaw=0°')
         
         send_goal_future = self._nav_to_pose_client.send_goal_async(goal_msg)
         send_goal_future.add_done_callback(self._transit_goal_response_callback)
