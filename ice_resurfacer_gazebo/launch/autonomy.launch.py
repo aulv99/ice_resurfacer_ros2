@@ -26,7 +26,7 @@ def generate_launch_description():
         PythonLaunchDescriptionSource(
             os.path.join(pkg_ros_gz_sim, 'launch', 'gz_sim.launch.py')
         ),
-        launch_arguments={'gz_args': ' -r ' + os.path.join(pkg_ice_gazebo, 'worlds', 'ice_rink.sdf')}.items(),
+        launch_arguments={'gz_args': ' -r ' + os.path.join(pkg_ice_gazebo, 'worlds', 'ice_rink_detailed.sdf')}.items(),
     )
 
     # ROBOT DESCRIPTION
@@ -49,11 +49,13 @@ def generate_launch_description():
             '-topic', 'robot_description',
             '-name', 'ice_resurfacer',
             '-z', '1.5',
-            '-y', '-10.75', 
-            '-x', '-32.0' 
+            '-y', '-10.75',
+            '-x', '-32.0'
         ],
         output='screen'
-    )
+    ) 
+
+
 
     # SENSOR BRIDGE (Clock, Lidar, IMU)
     sensor_bridge = Node(
