@@ -50,7 +50,7 @@ def generate_launch_description():
             '-name', 'ice_resurfacer',
             '-z', '1.5',
             '-y', '-10.75',
-            '-x', '-32.0'
+            '-x', '-48.0'
         ],
         output='screen'
     ) 
