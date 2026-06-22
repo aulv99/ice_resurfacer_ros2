@@ -26,7 +26,7 @@ def generate_launch_description():
         PythonLaunchDescriptionSource(
             os.path.join(pkg_ros_gz_sim, 'launch', 'gz_sim.launch.py')
         ),
-        launch_arguments={'gz_args': ' -r ' + os.path.join(pkg_ice_gazebo, 'worlds', 'ice_rink_detailed.sdf')}.items(),
+        launch_arguments={'gz_args': ' -r ' + os.path.join(pkg_ice_gazebo, 'worlds', 'icehall_260622.sdf')}.items(),
     )
 
     # ROBOT DESCRIPTION
