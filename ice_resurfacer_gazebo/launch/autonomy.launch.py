@@ -49,8 +49,8 @@ def generate_launch_description():
             '-topic', 'robot_description',
             '-name', 'ice_resurfacer',
             '-z', '1.5',
-            '-y', '-10.75',
-            '-x', '-48.0'
+            '-y', '-10.25',
+            '-x', '-34.5'
         ],
         output='screen'
     ) 
@@ -78,33 +78,33 @@ def generate_launch_description():
         output='screen'
     )
 
-    tf_base_footprint = Node(
-        package='tf2_ros',
-        executable='static_transform_publisher',
-        arguments=['0', '0', '0', '0', '0', '0', 'base_link', 'base_footprint']
-    )
-    
-    # # STATIC TF BRIDGE
-    # tf_map_odom = Node(
+    # tf_base_footprint = Node(
     #     package='tf2_ros',
     #     executable='static_transform_publisher',
-    #     arguments=['0', '0', '0', '0', '0', '0', 'map', 'odom']
-    # )
-
-    # # MAP SERVER
-    # map_server = Node(
-    #     package='nav2_map_server',
-    #     executable='map_server',
-    #     name='map_server',
-    #     parameters=[{'yaml_filename': os.path.join(pkg_ice_nav, 'maps', 'iihf_rink9.yaml')}]
+    #     arguments=['0', '0', '0', '0', '0', '0', 'base_link', 'base_footprint']
     # )
     
-    # lifecycle_manager_map = Node(
-    #     package='nav2_lifecycle_manager',
-    #     executable='lifecycle_manager',
-    #     name='lifecycle_manager_map',
-    #     parameters=[{'autostart': True}, {'node_names': ['map_server']}]
-    # )
+    # STATIC TF BRIDGE
+    tf_map_odom = Node(
+        package='tf2_ros',
+        executable='static_transform_publisher',
+        arguments=['0', '0', '0', '0', '0', '0', 'map', 'odom']
+    )
+
+    # MAP SERVER
+    map_server = Node(
+        package='nav2_map_server',
+        executable='map_server',
+        name='map_server',
+        parameters=[{'yaml_filename': os.path.join(pkg_ice_nav, 'maps', 'PerfectRefinedMap.yaml')}]
+    )
+    
+    lifecycle_manager_map = Node(
+        package='nav2_lifecycle_manager',
+        executable='lifecycle_manager',
+        name='lifecycle_manager_map',
+        parameters=[{'autostart': True}, {'node_names': ['map_server']}]
+    )
 
     # CONTROLLER SPAWNERS
     diff_drive_spawner = Node(
@@ -164,13 +164,13 @@ def generate_launch_description():
         spawn_entity,
         sensor_bridge,
         gz_odom_bridge,      
-        # tf_map_odom,         
-        # map_server,          
-        # lifecycle_manager_map, 
+        tf_map_odom,         
+        map_server,          
+        lifecycle_manager_map, 
         diff_drive_spawner,  
         ackermann_spawner,
         conditioner_spawner,    
         start_ekf_node,
         start_nav2_cmd,
-        tf_base_footprint
+        # tf_base_footprint
     ])
