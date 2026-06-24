@@ -1,0 +1,7 @@
+image: PerfectRefinedMap3.pgm
+mode: trinary
+resolution: 0.050
+origin: [-52.975, -23.15, 0.000000]
+negate: 0
+occupied_thresh: 0.65
+free_thresh: 0.196

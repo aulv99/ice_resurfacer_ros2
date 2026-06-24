@@ -29,13 +29,13 @@ class ZamboniExitNode(Node):
 
         # --- GARAGE COORDINATES ---
         # Based on your early logs, the garage is at X: -32.0, Y: -10.75
-        target_x = -32.0
-        target_y = -11.75
+        target_x = -35.0
+        target_y = -10.25
         
         # You can adjust this based on how you want it parked in the garage.
         # math.pi = Facing West (pulling straight in). 
         # 0.0 = Facing East (backed in). Nav2's Reeds-Shepp will reverse it automatically if needed!
-        target_yaw = 0.0 # math.pi  
+        target_yaw = math.pi  
 
         goal_msg = NavigateToPose.Goal()
         goal_msg.pose.header.frame_id = 'map'
