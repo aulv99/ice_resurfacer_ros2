@@ -8,15 +8,15 @@ controller_server:
     goal_checker_plugins: ["goal_checker"]
     goal_checker:
       plugin: "nav2_controller::SimpleGoalChecker"
-      xy_goal_tolerance: 0.25    # Must be within 25cm of X=-10, Y=0
-      yaw_goal_tolerance: 0.75   # Must be facing almost exactly East
+      xy_goal_tolerance: 0.25    
+      yaw_goal_tolerance: 0.75   
       stateful: True
     
     FollowPath:
       plugin: "nav2_regulated_pure_pursuit_controller::RegulatedPurePursuitController"
-      desired_linear_vel: 2.0           # Cruising speed (m/s)
+      desired_linear_vel: 0.5           # Cruising speed (m/s) (2.0)
 
-      lookahead_dist: 2.0               # How far ahead on the path it looks to steer
+      lookahead_dist: 2.0               # How far ahead on the path it looks to steer (2.0)
       min_lookahead_dist: 1.0
       max_lookahead_dist: 4.0
       lookahead_time: 1.5
@@ -190,8 +190,8 @@ planner_server:
       angle_quantization_bins: 72         # 5-degree increments
       analytic_expansion_ratio: 3.5
       analytic_expansion_max_length: 50.0
-      minimum_turning_radius: 3.0       # CRITICAL: Zamboni's physical turn limit
-      reverse_penalty: 1.0                # Discourage reversing unless necessary
+      minimum_turning_radius: 4.0       # CRITICAL: Zamboni's physical turn limit
+      reverse_penalty: 0.0                # Discourage reversing unless necessary
       change_penalty: 0.0                 # Penalty for changing gear
       non_straight_penalty: 1.20          # Keep straight when possible
       cost_penalty: 2.0
