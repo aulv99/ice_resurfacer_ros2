@@ -51,7 +51,7 @@ class ZamboniExitNode(Node):
                 
                 # Note: 5.0 rad/s is a massive steering command for Ackermann. 
                 # Your controller will likely just cap this at maximum steering lock.
-                twist.angular.z = 1.0  
+                twist.angular.z = 0.1  
                 
                 self.cmd_vel_pub.publish(twist)
             else:
@@ -139,11 +139,23 @@ class ZamboniExitNode(Node):
     def _exit_result_3b_callback(self, future):
         result = future.result()
         if result.status == GoalStatus.STATUS_SUCCEEDED:
-            self.get_logger().info('Snow Unloaded! Engaging Manual Reverse Override...')
-            # Change the state so the odom_callback takes over!
-            self.mission_state = 'REVERSING_OUT_OF_PIT'
+            self.get_logger().info('Unloading Snow. Waiting 3 seconds for the pit to clear...')
+            
+            # Publish a zero-velocity Twist to ensure the brakes are held during the wait
+            self.cmd_vel_pub.publish(Twist())
+            
+            # Create a one-shot timer that waits 3.0 seconds, then calls the reverse function
+            self.delay_timer = self.create_timer(3.0, self._trigger_manual_reverse)
         else:
             self.get_logger().error(f'Exit maneuver failed with status code: {result.status}')
+
+    def _trigger_manual_reverse(self):
+        # 1. Destroy the timer so it only executes exactly once
+        self.delay_timer.cancel()
+        
+        # 2. Change the state to unlock the odom_callback
+        self.get_logger().info('Wait complete. Engaging Manual Reverse Override...')
+        self.mission_state = 'REVERSING_OUT_OF_PIT'
 
     # --- PARK TO GARAGE (PHASE 3C) ---
     def start_exit_maneuver_3c(self):

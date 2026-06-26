@@ -395,7 +395,7 @@ class ZamboniMissionNode(Node):
         self.mission_state = 'TRANSITING_ESCAPE'
         
         # Exact same Y-coordinate as spawn so it drives perfectly straight
-        target_x = -25.0
+        target_x = -27.5
         target_y = -10.25 
 
         goal_msg = NavigateToPose.Goal()
@@ -430,7 +430,7 @@ class ZamboniMissionNode(Node):
         self.mission_state = 'TRANSITING_STAGING'
         
         # Your original target coordinates for the Phase 2 handoff
-        target_x = -14.0
+        target_x = -13.0
         target_y = 0.0 - LANE_SPACING 
 
         goal_msg = NavigateToPose.Goal()
