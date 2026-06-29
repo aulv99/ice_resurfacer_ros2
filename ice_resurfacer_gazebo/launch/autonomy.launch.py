@@ -42,34 +42,34 @@ def generate_launch_description():
     )
 
     # SPAWN THE ROBOT
-    # spawn_entity = Node(
-    #     package='ros_gz_sim',
-    #     executable='create',
-    #     arguments=[
-    #         '-topic', 'robot_description',
-    #         '-name', 'ice_resurfacer',
-    #         '-z', '1.5',
-    #         '-y', '-10.25',
-    #         '-x', '-34.5'
-    #     ],
-    #     output='screen'
-    # ) 
-
     spawn_entity = Node(
         package='ros_gz_sim',
         executable='create',
         arguments=[
             '-topic', 'robot_description',
             '-name', 'ice_resurfacer',
-            '-x', '-24.9185', 
-            '-y', '-5.5665', 
-            '-z', '1.4',       # Dropped to 0.1m so it doesn't slam into the ice from 1.5m
-            '-R', '0.0',       # Roll
-            '-P', '0.0',       # Pitch
-            '-Y', '-1.918'     # Yaw (Calculated from your quaternion)
+            '-z', '1.4',
+            '-y', '-10.25',
+            '-x', '-34.5'
         ],
         output='screen'
-    )
+    ) 
+
+    # spawn_entity = Node(
+    #     package='ros_gz_sim',
+    #     executable='create',
+    #     arguments=[
+    #         '-topic', 'robot_description',
+    #         '-name', 'ice_resurfacer',
+    #         '-x', '-24.9185', 
+    #         '-y', '-5.5665', 
+    #         '-z', '1.4',       # Dropped to 0.1m so it doesn't slam into the ice from 1.5m
+    #         '-R', '0.0',       # Roll
+    #         '-P', '0.0',       # Pitch
+    #         '-Y', '-1.918'     # Yaw (Calculated from your quaternion)
+    #     ],
+    #     output='screen'
+    # )
 
 
 

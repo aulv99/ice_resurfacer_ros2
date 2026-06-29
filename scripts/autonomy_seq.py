@@ -9,6 +9,8 @@ from nav2_msgs.action import FollowPath, NavigateToPose
 from nav2_msgs.msg import SpeedLimit
 from action_msgs.msg import GoalStatus
 from rclpy.qos import QoSProfile, QoSDurabilityPolicy, QoSReliabilityPolicy, qos_profile_sensor_data
+from control_msgs.action import FollowJointTrajectory
+from trajectory_msgs.msg import JointTrajectoryPoint
 
 # ============================================================
 # RINK & ZAMBONI PARAMETERS
@@ -115,17 +117,11 @@ def generate_wall_to_sweep_transition(x_wall, y_sweep_top, x_sweep_start):
 
 def generate_staging_alignment(staging_x, staging_y, target_x, target_y):
     x, y, v = [], [], []
-    
-    # 1. THE STABILIZATION STRAIGHT (The Runway)
-    # Give Pure Pursuit 14 meters to fix Nav2's sloppy angle before turning
     u_turn_start_x = -10.0
-    
-    # 1. Runway (-15 to -10)
     if staging_x < u_turn_start_x:
         sx, sy = sample_line((staging_x, staging_y), (u_turn_start_x, staging_y))
         append_segment(x, y, v, sx, sy, WALL_STRAIGHT_SPEED)
         
-    # 2. U-Turn (Starts -10, -2 -> Ends -10, -13)
     u_turn_end_y = -13.0
     radius = abs(staging_y - u_turn_end_y) / 2.0
     center_x = u_turn_start_x
@@ -134,21 +130,13 @@ def generate_staging_alignment(staging_x, staging_y, target_x, target_y):
     sx, sy = sample_arc((center_x, center_y), radius, math.pi/2, -math.pi/2)
     append_segment(x, y, v, sx, sy, WALL_CORNER_SPEED)
     
-    # 3. Glide (-10, -13 down to target Lap 0 rails at -15.0)
     tx, ty = generate_wall_lane_change_horizontal(
-        start_x=u_turn_start_x, 
-        end_x=target_x, 
-        start_y=u_turn_end_y, 
-        end_y=target_y,
-        n_points=60
+        start_x=u_turn_start_x, end_x=target_x, start_y=u_turn_end_y, end_y=target_y, n_points=60
     )
     append_segment(x, y, v, tx, ty, WALL_STRAIGHT_SPEED)
     
     return x, y, v
 
-# ============================================================
-# SWEEP GENERATOR
-# ============================================================
 def generate_classic_zamboni_sweeps(x_limit, y_top_start, y_bottom_start, lane_spacing, num_passes):
     x, y, v = [], [], []
     current_y_top = y_top_start
@@ -180,9 +168,6 @@ def generate_classic_zamboni_sweeps(x_limit, y_top_start, y_bottom_start, lane_s
 
     return x, y, v
 
-# ============================================================
-# OFFSET RINK LAP 
-# ============================================================
 def generate_full_wall_lap_bottom(offset_straight, offset_corner, start_x, end_x):
     x, y, v = [], [], []
     r = CORNER_RADIUS - offset_corner
@@ -194,42 +179,30 @@ def generate_full_wall_lap_bottom(offset_straight, offset_corner, start_x, end_x
 
     sx, sy = sample_dynamic_line_x_major(start_x, cx_bl, cx_br, cx_bl, -15.0, offset_straight, offset_corner, +1)
     append_segment(x, y, v, sx, sy, WALL_STRAIGHT_SPEED)
-
     sx, sy = sample_arc((cx_bl, cy_bl), r, -math.pi/2, -math.pi)
     append_segment(x, y, v, sx, sy, WALL_CORNER_SPEED)
-
     sx, sy = sample_dynamic_line_y_major(cy_bl, cy_tl, cy_bl, cy_tl, -30.0, offset_straight, offset_corner, +1)
     append_segment(x, y, v, sx, sy, WALL_STRAIGHT_SPEED)
-
     sx, sy = sample_arc((cx_tl, cy_tl), r, math.pi, math.pi/2)
     append_segment(x, y, v, sx, sy, WALL_CORNER_SPEED)
-
     sx, sy = sample_dynamic_line_x_major(cx_tl, cx_tr, cx_tl, cx_tr, 15.0, offset_straight, offset_corner, -1)
     append_segment(x, y, v, sx, sy, WALL_STRAIGHT_SPEED)
-
     sx, sy = sample_arc((cx_tr, cy_tr), r, math.pi/2, 0)
     append_segment(x, y, v, sx, sy, WALL_CORNER_SPEED)
-
     sx, sy = sample_dynamic_line_y_major(cy_tr, cy_br, cy_tr, cy_br, 30.0, offset_straight, offset_corner, -1)
     append_segment(x, y, v, sx, sy, WALL_STRAIGHT_SPEED)
-
     sx, sy = sample_arc((cx_br, cy_br), r, 0, -math.pi/2)
     append_segment(x, y, v, sx, sy, WALL_CORNER_SPEED)
-
     sx, sy = sample_dynamic_line_x_major(cx_br, end_x, cx_br, cx_bl, -15.0, offset_straight, offset_corner, +1)
     append_segment(x, y, v, sx, sy, WALL_STRAIGHT_SPEED)
 
     return x, y, v
 
-# ============================================================
-# MASTER GENERATOR
-# ============================================================
 def generate_zamboni_path():
     px, py, pv = [], [], []
 
-    # THE DYNAMIC MARGINS
-    margin_straight = 0.05
-    margin_corner = 0.11
+    margin_straight = 0.03
+    margin_corner = 0.09
     first_offset_straight = CONDITIONER_WIDTH/2 + margin_straight
     first_offset_corner = CONDITIONER_WIDTH/2 + margin_corner
 
@@ -238,34 +211,19 @@ def generate_zamboni_path():
     cy_tl = 15.0 - CORNER_RADIUS
     cy_bl = -15.0 + CORNER_RADIUS
 
-    # Calculate exact Y coordinate of your Lap 0 starting rail
     lap0_start_x = -15.0
     lap0_end_x = -15.0
     lap0_start_y = -15.0 + first_offset_straight
 
-    # ==========================================
-    # 0. STAGING ALIGNMENT (The 180 Drop-In)
-    # ==========================================
-    # This seamlessly bridges the Nav2 staging point to the Lap 0 rails
     staging_x = -15.0
     staging_y = -2.0
-    
     tx0, ty0, tv0 = generate_staging_alignment(
-        staging_x=staging_x, 
-        staging_y=staging_y, 
-        target_x=lap0_start_x, 
-        target_y=lap0_start_y
+        staging_x=staging_x, staging_y=staging_y, target_x=lap0_start_x, target_y=lap0_start_y
     )
     px.extend(tx0); py.extend(ty0); pv.extend(tv0)
 
-    # ==========================================
-    # 1. LAP 0 (The Outer Lap)
-    # ==========================================
     lx0, ly0, lv0 = generate_full_wall_lap_bottom(
-        offset_straight=first_offset_straight, 
-        offset_corner=first_offset_corner, 
-        start_x=lap0_start_x, 
-        end_x=lap0_end_x
+        offset_straight=first_offset_straight, offset_corner=first_offset_corner, start_x=lap0_start_x, end_x=lap0_end_x
     )
     px.extend(lx0); py.extend(ly0); pv.extend(lv0)
 
@@ -276,16 +234,12 @@ def generate_zamboni_path():
     lap1_start_y = -15.0 + offset_1 
 
     tx1, ty1 = generate_wall_lane_change_horizontal(
-        start_x=lap0_end_x, end_x=lap1_start_x,
-        start_y=lap0_end_y, end_y=lap1_start_y
+        start_x=lap0_end_x, end_x=lap1_start_x, start_y=lap0_end_y, end_y=lap1_start_y
     )
     append_segment(px, py, pv, tx1, ty1, WALL_CORNER_SPEED)
 
     lx1, ly1, lv1 = generate_full_wall_lap_bottom(
-        offset_straight=offset_1, 
-        offset_corner=offset_1, 
-        start_x=lap1_start_x, 
-        end_x=lap1_start_x
+        offset_straight=offset_1, offset_corner=offset_1, start_x=lap1_start_x, end_x=lap1_start_x
     )
     px.extend(lx1); py.extend(ly1); pv.extend(lv1)
 
@@ -312,47 +266,19 @@ def generate_zamboni_path():
     px.extend(tx2); py.extend(ty2); pv.extend(tv2)
 
     sweep_x, sweep_y, sweep_v = generate_classic_zamboni_sweeps(
-        x_limit=sweep_x_limit,       
-        y_top_start=y_sweep_top_start,        
-        y_bottom_start=-10.4,       
-        lane_spacing=LANE_SPACING,       
-        num_passes=6            
+        x_limit=sweep_x_limit, y_top_start=y_sweep_top_start, y_bottom_start=-10.4, lane_spacing=LANE_SPACING, num_passes=6            
     )
-    
     px.extend(sweep_x); py.extend(sweep_y); pv.extend(sweep_v)
 
-    # ==========================================
-    # 7. EXIT MANEUVER (90-Degree Left Turn)
-    # ==========================================
-    # The Zamboni is facing West at the end of the final sweep (X = -20.0). 
-    # We execute a 6.0m radius left turn to face South, pointing it at the garage.
     exit_radius = 5.0
     exit_center_x = px[-1]
     exit_center_y = py[-1] - exit_radius
     
-    # Draw arc from Top of circle (pi/2) to Left side (pi)
     sx, sy = sample_arc((exit_center_x, exit_center_y), exit_radius, math.pi/2, math.pi)
     append_segment(px, py, pv, sx, sy, WALL_CORNER_SPEED)
 
-    # THIS WILL END HERE:
-    # position:
-    #   x: -24.918502307223296
-    #   y: -5.5665445933599
-    #   z: 0.0
-    # orientation:
-    #   x: 0.0
-    #   y: 0.0
-    #   z: -0.8370315484188787
-    #   w: 0.5471546280088421
-
     return px, py, pv
 
-# ============================================================
-# ROS 2 CLIENT NODE (TWO-PHASE STATE MACHINE)
-# ============================================================
-# ============================================================
-# ROS 2 CLIENT NODE (CUSTOM PURE PURSUIT STATE MACHINE)
-# ============================================================
 def get_quaternion_from_yaw(yaw):
     q = Quaternion()
     q.x = 0.0
@@ -361,15 +287,18 @@ def get_quaternion_from_yaw(yaw):
     q.w = math.cos(yaw / 2.0)
     return q
 
-class ZamboniMissionNode(Node):
+# ============================================================
+# MASTER ROS 2 CLIENT NODE (ALL PHASES)
+# ============================================================
+class ZamboniMasterNode(Node):
     def __init__(self):
-        super().__init__('zamboni_mission_node')
+        super().__init__('zamboni_master_node')
         
         # --- Action Clients & Publishers ---
         self._nav_to_pose_client = ActionClient(self, NavigateToPose, 'navigate_to_pose')
-        
-        # We now publish directly to the drivetrain for Phase 2!
         self.cmd_vel_pub = self.create_publisher(Twist, '/cmd_vel', 10)
+        self._nav_to_pose_client = ActionClient(self, NavigateToPose, 'navigate_to_pose')
+        self._conditioner_client = ActionClient(self, FollowJointTrajectory, '/conditioner_controller/follow_joint_trajectory')
         
         # --- State Tracking ---
         self.mission_state = 'IDLE'  
@@ -385,16 +314,119 @@ class ZamboniMissionNode(Node):
             qos_profile_sensor_data
         )
 
+    # ------------- Ice Conditioner Actuation logic -------------
+    def set_conditioner_position(self, target_position, duration_sec=3):
+        self.get_logger().info(f'Actuating conditioner to position: {target_position}')
+        
+        if not self._conditioner_client.wait_for_server(timeout_sec=2.0):
+            self.get_logger().error('Conditioner Action Server not available!')
+            return
+
+        goal_msg = FollowJointTrajectory.Goal()
+        goal_msg.trajectory.joint_names = ['conditioner_joint']
+        
+        point = JointTrajectoryPoint()
+        point.positions = [float(target_position)]
+        point.time_from_start.sec = int(duration_sec)
+        point.time_from_start.nanosec = 0
+        
+        goal_msg.trajectory.points = [point]
+        
+        # We send it asynchronously so the Zamboni can keep driving while it lowers/raises!
+        self._conditioner_client.send_goal_async(goal_msg)
+
     # ============================================================
-    # PHASE 1: TRANSIT (Remains unchanged, handled by Nav2)
+    # SHARED ODOMETRY CALLBACK (Traffic Controller)
+    # ============================================================
+    def odom_callback(self, msg):
+        # ----------------------------------------------------
+        # PHASE 2: RESURFACING PURE PURSUIT
+        # ----------------------------------------------------
+        if self.mission_state == 'RESURFACING': 
+            rx = msg.pose.pose.position.x
+            ry = msg.pose.pose.position.y
+            
+            q = msg.pose.pose.orientation
+            siny_cosp = 2 * (q.w * q.z + q.x * q.y)
+            cosy_cosp = 1 - 2 * (q.y * q.y + q.z * q.z)
+            ryaw = math.atan2(siny_cosp, cosy_cosp)
+
+            search_window = 100 
+            start_idx = self.current_path_index
+            end_idx = min(start_idx + search_window, len(self.path_x))
+            
+            dx_arr = self.path_x[start_idx:end_idx] - rx
+            dy_arr = self.path_y[start_idx:end_idx] - ry
+            distances = dx_arr**2 + dy_arr**2
+            local_closest = np.argmin(distances)
+            
+            self.current_path_index = start_idx + local_closest
+
+            # Phase 2 Complete! Transition to Phase 3.
+            if self.current_path_index >= len(self.path_x) - 5:
+                self.cmd_vel_pub.publish(Twist())
+                self.set_conditioner_position(-0.2) 
+                self.mission_state = 'TRANSITING_EXIT'
+                self.get_logger().info('Resurfacing Complete! Initiating Phase 3 Exit Sequence...')
+                self.start_exit_maneuver_3a()
+                return
+
+            lookahead_dist = 2.5  
+            lookahead_idx = self.current_path_index
+            
+            while lookahead_idx < len(self.path_x) - 1:
+                dist = math.hypot(self.path_x[lookahead_idx] - rx, self.path_y[lookahead_idx] - ry)
+                if dist >= lookahead_dist:
+                    break
+                lookahead_idx += 1
+
+            target_x = self.path_x[lookahead_idx]
+            target_y = self.path_y[lookahead_idx]
+            target_v = self.path_v[self.current_path_index] 
+
+            alpha = math.atan2(target_y - ry, target_x - rx) - ryaw
+            alpha = math.atan2(math.sin(alpha), math.cos(alpha)) 
+
+            curvature = (2.0 * math.sin(alpha)) / lookahead_dist
+            angular_velocity = target_v * curvature
+
+            twist = Twist()
+            twist.linear.x = float(target_v)
+            twist.angular.z = float(angular_velocity)
+            self.cmd_vel_pub.publish(twist)
+            return
+
+        # ----------------------------------------------------
+        # PHASE 3: THE MANUAL REVERSE OVERRIDE
+        # ----------------------------------------------------
+        elif self.mission_state == 'REVERSING_OUT_OF_PIT':
+            q = msg.pose.pose.orientation
+            siny_cosp = 2 * (q.w * q.z + q.x * q.y)
+            cosy_cosp = 1 - 2 * (q.y * q.y + q.z * q.z)
+            current_yaw = math.atan2(siny_cosp, cosy_cosp)
+            
+            if current_yaw < -0.05:
+                twist = Twist()
+                twist.linear.x = -0.5  
+                twist.angular.z = 0.1  
+                self.cmd_vel_pub.publish(twist)
+            else:
+                self.cmd_vel_pub.publish(Twist())
+                self.mission_state = 'NAVIGATING'
+                self.get_logger().info(f'Safely reversed! (Yaw: {current_yaw:.2f}). Handing back to Nav2 for Final Park...')
+                self.start_exit_maneuver_3c()
+            return
+
+
+    # ============================================================
+    # PHASE 1A: ESCAPING THE TUNNEL
     # ============================================================
     def start_phase_1_transit(self):
-        self.get_logger().info('Step 1A: Escaping the garage tunnel...')
+        self.get_logger().info('Phase 1A: Escaping the garage tunnel...')
         self._nav_to_pose_client.wait_for_server()
         
         self.mission_state = 'TRANSITING_ESCAPE'
         
-        # Exact same Y-coordinate as spawn so it drives perfectly straight
         target_x = -27.5
         target_y = -10.25 
 
@@ -429,7 +461,6 @@ class ZamboniMissionNode(Node):
     def start_phase_1b_staging(self):
         self.mission_state = 'TRANSITING_STAGING'
         
-        # Your original target coordinates for the Phase 2 handoff
         target_x = -13.0
         target_y = 0.0 - LANE_SPACING 
 
@@ -458,103 +489,134 @@ class ZamboniMissionNode(Node):
             self.start_phase_2_resurfacing()
 
     # ============================================================
-    # PHASE 2: RIGID RESURFACING (Native Python Controller)
+    # PHASE 2: INITIATING RIGID RESURFACING
     # ============================================================
     def start_phase_2_resurfacing(self):
-        self.get_logger().info('Step 2: Resurfacing...')
+        self.get_logger().info('Phase 2: Resurfacing Engaged...')
         px, py, pv = generate_zamboni_path()
-        
+
+        self.set_conditioner_position(0.2)
         self.path_x = np.array(px)
         self.path_y = np.array(py)
         self.path_v = np.array(pv)
         self.current_path_index = 0
         
-        # Unlocking the odom_callback to start driving immediately
+        # This unlocks the odom_callback's Phase 2 block!
         self.mission_state = 'RESURFACING'
-        # self.get_logger().info('Custom Pure Pursuit Engaged. Driving to geometry!')
 
     # ============================================================
-    # THE INDEX-GATED PURE PURSUIT (The Ultimate Fix)
+    # PHASE 3A: NAVIGATE OUT OF RINK
     # ============================================================
-    def odom_callback(self, msg):
-        if self.mission_state != 'RESURFACING': 
+    def start_exit_maneuver_3a(self):
+        self.get_logger().info('Phase 3A: Generating dynamic route back to Garage Tunnel...')
+
+        target_x = -34.5
+        target_y = -10.25
+        target_yaw = math.pi  
+
+        goal_msg = NavigateToPose.Goal()
+        goal_msg.pose.header.frame_id = 'map'
+        goal_msg.pose.header.stamp = self.get_clock().now().to_msg()
+        goal_msg.pose.pose.position.x = float(target_x)
+        goal_msg.pose.pose.position.y = float(target_y)
+        goal_msg.pose.pose.orientation = get_quaternion_from_yaw(target_yaw)
+
+        send_goal_future = self._nav_to_pose_client.send_goal_async(goal_msg)
+        send_goal_future.add_done_callback(self._exit_goal_3a_response_callback)
+
+    def _exit_goal_3a_response_callback(self, future):
+        goal_handle = future.result()
+        if not goal_handle.accepted:
+            self.get_logger().error('Exit goal rejected by Nav2!')
             return
+        get_result_future = goal_handle.get_result_async()
+        get_result_future.add_done_callback(self._exit_result_3a_callback)
 
-        rx = msg.pose.pose.position.x
-        ry = msg.pose.pose.position.y
-        
-        # Extract Zamboni's current Yaw angle
-        q = msg.pose.pose.orientation
-        siny_cosp = 2 * (q.w * q.z + q.x * q.y)
-        cosy_cosp = 1 - 2 * (q.y * q.y + q.z * q.z)
-        ryaw = math.atan2(siny_cosp, cosy_cosp)
+    def _exit_result_3a_callback(self, future):
+        result = future.result()
+        if result.status == GoalStatus.STATUS_SUCCEEDED:
+            self.get_logger().info('Phase 3A Complete! Zamboni has cleared the tunnel.')
+            self.start_exit_maneuver_3b()
 
-        # ----------------------------------------------------
-        # 1. THE BLINDERS (Index-Gated Search)
-        # We only search the next 100 points (~10 meters). 
-        # It is physically impossible to jump to an intersecting loop.
-        # ----------------------------------------------------
-        search_window = 100 
-        start_idx = self.current_path_index
-        end_idx = min(start_idx + search_window, len(self.path_x))
-        
-        dx_arr = self.path_x[start_idx:end_idx] - rx
-        dy_arr = self.path_y[start_idx:end_idx] - ry
-        distances = dx_arr**2 + dy_arr**2
-        local_closest = np.argmin(distances)
-        
-        # Shift our global progress forward
-        self.current_path_index = start_idx + local_closest
+    # ============================================================
+    # PHASE 3B: NAVIGATE TO SNOW UNLOAD STATION
+    # ============================================================
+    def start_exit_maneuver_3b(self):
+        self.get_logger().info('Phase 3B: Transitioning to Snow Unload Station...')
 
-        # Have we reached the end of the array?
-        if self.current_path_index >= len(self.path_x) - 5:
-            self.cmd_vel_pub.publish(Twist()) # Hit the brakes
-            self.mission_state = 'IDLE'
-            self.get_logger().info('Resurfacing Complete. Ready for Garage Transit.')
+        target_x = -41.50
+        target_y = -20.0
+        target_yaw = -math.pi / 2
+
+        goal_msg = NavigateToPose.Goal()
+        goal_msg.pose.header.frame_id = 'map'
+        goal_msg.pose.header.stamp = self.get_clock().now().to_msg()
+        goal_msg.pose.pose.position.x = float(target_x)
+        goal_msg.pose.pose.position.y = float(target_y)
+        goal_msg.pose.pose.orientation = get_quaternion_from_yaw(target_yaw)
+        
+        send_goal_future = self._nav_to_pose_client.send_goal_async(goal_msg)
+        send_goal_future.add_done_callback(self._exit_goal_3b_response_callback)
+
+    def _exit_goal_3b_response_callback(self, future):
+        goal_handle = future.result()
+        if not goal_handle.accepted:
+            self.get_logger().error('Exit goal rejected by Nav2!')
             return
+        get_result_future = goal_handle.get_result_async()
+        get_result_future.add_done_callback(self._exit_result_3b_callback)
 
-        # ----------------------------------------------------
-        # 2. FIND THE LOOKAHEAD POINT
-        # ----------------------------------------------------
-        lookahead_dist = 2.5  # Adjust this: higher = smoother, lower = tighter tracking
-        lookahead_idx = self.current_path_index
-        
-        while lookahead_idx < len(self.path_x) - 1:
-            dist = math.hypot(self.path_x[lookahead_idx] - rx, self.path_y[lookahead_idx] - ry)
-            if dist >= lookahead_dist:
-                break
-            lookahead_idx += 1
+    def _exit_result_3b_callback(self, future):
+        result = future.result()
+        if result.status == GoalStatus.STATUS_SUCCEEDED:
+            self.get_logger().info('Unloading Snow. Waiting 3 seconds for the pit to clear...')
+            self.cmd_vel_pub.publish(Twist())
+            self.delay_timer = self.create_timer(3.0, self._trigger_manual_reverse)
 
-        target_x = self.path_x[lookahead_idx]
-        target_y = self.path_y[lookahead_idx]
-        target_v = self.path_v[self.current_path_index] # Live speed profiling!
+    def _trigger_manual_reverse(self):
+        self.delay_timer.cancel()
+        self.get_logger().info('Wait complete. Engaging Manual Reverse Override...')
+        # This unlocks the odom_callback's Phase 3 block!
+        self.mission_state = 'REVERSING_OUT_OF_PIT'
 
-        # ----------------------------------------------------
-        # 3. KINEMATIC STEERING MATH
-        # ----------------------------------------------------
-        # Calculate angle between robot heading and lookahead point
-        alpha = math.atan2(target_y - ry, target_x - rx) - ryaw
-        
-        # Normalize angle to [-pi, pi] to prevent crazy spins
-        alpha = math.atan2(math.sin(alpha), math.cos(alpha)) 
+    # ============================================================
+    # PHASE 3C: FINAL PARK IN GARAGE
+    # ============================================================
+    def start_exit_maneuver_3c(self):
+        self.get_logger().info('Phase 3C: Driving back to garage...')
 
-        # Pure Pursuit Curvature Formula
-        curvature = (2.0 * math.sin(alpha)) / lookahead_dist
-        angular_velocity = target_v * curvature
+        target_x = -34.5
+        target_y = -10.25
+        target_yaw = 0.0
 
-        # ----------------------------------------------------
-        # 4. PUBLISH COMMAND DIRECTLY TO DRIVETRAIN
-        # ----------------------------------------------------
-        twist = Twist()
-        twist.linear.x = float(target_v)
-        twist.angular.z = float(angular_velocity)
-        self.cmd_vel_pub.publish(twist)
+        goal_msg = NavigateToPose.Goal()
+        goal_msg.pose.header.frame_id = 'map'
+        goal_msg.pose.header.stamp = self.get_clock().now().to_msg()
+        goal_msg.pose.pose.position.x = float(target_x)
+        goal_msg.pose.pose.position.y = float(target_y)
+        goal_msg.pose.pose.orientation = get_quaternion_from_yaw(target_yaw)
+
+        send_goal_future = self._nav_to_pose_client.send_goal_async(goal_msg)
+        send_goal_future.add_done_callback(self._exit_goal_3c_response_callback)
+
+    def _exit_goal_3c_response_callback(self, future):
+        goal_handle = future.result()
+        if not goal_handle.accepted:
+            self.get_logger().error('Parking goal rejected by Nav2!')
+            return
+        get_result_future = goal_handle.get_result_async()
+        get_result_future.add_done_callback(self._exit_result_3c_callback)
+
+    def _exit_result_3c_callback(self, future):
+        result = future.result()
+        if result.status == GoalStatus.STATUS_SUCCEEDED:
+            self.get_logger().info('MISSION COMPLETE! Zamboni is powered down and parked.')
 
 def main(args=None):
     rclpy.init(args=args)
-    client = ZamboniMissionNode()
+    client = ZamboniMasterNode()
     
-    # Kick off the two-phase mission automatically
+    # Kick off Phase 1 immediately
     client.start_phase_1_transit()
     
     rclpy.spin(client)
