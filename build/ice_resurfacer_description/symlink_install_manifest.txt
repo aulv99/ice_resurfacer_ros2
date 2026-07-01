@@ -1,7 +1,11 @@
 /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_description/share/ice_resurfacer_description/launch/visualize.launch.py
 /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_description/share/ice_resurfacer_description/urdf/ice_resurfacer.urdf.xacro
+/home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_description/share/ice_resurfacer_description/urdf/ice_resurfacer2.urdf.xacro
+/home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_description/share/ice_resurfacer_description/urdf/ice_resurfacer3.urdf.xacro
 /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_description/share/ice_resurfacer_description/config/controllers.yaml
 /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_description/share/ice_resurfacer_description/config/ekf.yaml
+/home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_description/share/ice_resurfacer_description/meshes/Conditioner.stl
+/home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_description/share/ice_resurfacer_description/meshes/Zamboni_body.stl
 /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_description/share/ament_index/resource_index/package_run_dependencies/ice_resurfacer_description
 /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_description/share/ament_index/resource_index/parent_prefix_path/ice_resurfacer_description
 /home/aaro/ice_resurfacer_ws/src/install/ice_resurfacer_description/share/ice_resurfacer_description/environment/ament_prefix_path.sh

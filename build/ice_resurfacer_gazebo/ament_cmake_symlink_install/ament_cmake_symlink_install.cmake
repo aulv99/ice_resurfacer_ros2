@@ -315,8 +315,8 @@ message(STATUS "Execute custom install script")
 
 # begin of custom install code
 
-# install(DIRECTORY "worlds" "launch" "meshes" "DESTINATION" "share/ice_resurfacer_gazebo")
-ament_cmake_symlink_install_directory("/home/aaro/ice_resurfacer_ws/src/ice_resurfacer_gazebo" DIRECTORY "worlds" "launch" "meshes" "DESTINATION" "share/ice_resurfacer_gazebo")
+# install(DIRECTORY "worlds" "launch" "meshes" "materials" "DESTINATION" "share/ice_resurfacer_gazebo")
+ament_cmake_symlink_install_directory("/home/aaro/ice_resurfacer_ws/src/ice_resurfacer_gazebo" DIRECTORY "worlds" "launch" "meshes" "materials" "DESTINATION" "share/ice_resurfacer_gazebo")
 
 # install(FILES "/home/aaro/ice_resurfacer_ws/src/build/ice_resurfacer_gazebo/ament_cmake_index/share/ament_index/resource_index/package_run_dependencies/ice_resurfacer_gazebo" "DESTINATION" "share/ament_index/resource_index/package_run_dependencies")
 ament_cmake_symlink_install_files("/home/aaro/ice_resurfacer_ws/src/ice_resurfacer_gazebo" FILES "/home/aaro/ice_resurfacer_ws/src/build/ice_resurfacer_gazebo/ament_cmake_index/share/ament_index/resource_index/package_run_dependencies/ice_resurfacer_gazebo" "DESTINATION" "share/ament_index/resource_index/package_run_dependencies")

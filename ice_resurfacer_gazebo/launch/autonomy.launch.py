@@ -30,7 +30,7 @@ def generate_launch_description():
     )
 
     # ROBOT DESCRIPTION
-    xacro_file = os.path.join(pkg_ice_description, 'urdf', 'ice_resurfacer2.urdf.xacro')
+    xacro_file = os.path.join(pkg_ice_description, 'urdf', 'ice_resurfacer3.urdf.xacro')
     robot_desc = Command(['xacro ', xacro_file])
 
     robot_state_publisher = Node(
