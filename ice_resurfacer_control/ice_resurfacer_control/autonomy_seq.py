@@ -11,6 +11,7 @@ from action_msgs.msg import GoalStatus
 from rclpy.qos import QoSProfile, QoSDurabilityPolicy, QoSReliabilityPolicy, qos_profile_sensor_data
 from control_msgs.action import FollowJointTrajectory
 from trajectory_msgs.msg import JointTrajectoryPoint
+from std_msgs.msg import String
 
 # ============================================================
 # RINK & ZAMBONI PARAMETERS
@@ -298,7 +299,8 @@ class ZamboniMasterNode(Node):
         self._nav_to_pose_client = ActionClient(self, NavigateToPose, 'navigate_to_pose')
         self.cmd_vel_pub = self.create_publisher(Twist, '/cmd_vel', 10)
         self._nav_to_pose_client = ActionClient(self, NavigateToPose, 'navigate_to_pose')
-        self._conditioner_client = ActionClient(self, FollowJointTrajectory, '/conditioner_controller/follow_joint_trajectory')
+        # self._conditioner_client = ActionClient(self, FollowJointTrajectory, '/conditioner_controller/follow_joint_trajectory')
+        self.state_pub = self.create_publisher(String, '/mission_state', 10)
         
         # --- State Tracking ---
         self.mission_state = 'IDLE'  
@@ -314,26 +316,34 @@ class ZamboniMasterNode(Node):
             qos_profile_sensor_data
         )
 
-    # ------------- Ice Conditioner Actuation logic -------------
-    def set_conditioner_position(self, target_position, duration_sec=3):
-        self.get_logger().info(f'Actuating conditioner to position: {target_position}')
-        
-        if not self._conditioner_client.wait_for_server(timeout_sec=2.0):
-            self.get_logger().error('Conditioner Action Server not available!')
-            return
+    def set_and_publish_state(self, new_state):
+        """ Updates internal state and broadcasts it to the ROS network """
+        self.mission_state = new_state
+        msg = String()
+        msg.data = new_state
+        self.state_pub.publish(msg)
+        self.get_logger().info(f">>> STATE CHANGED: {new_state} <<<")  
 
-        goal_msg = FollowJointTrajectory.Goal()
-        goal_msg.trajectory.joint_names = ['conditioner_joint']
+    # ------------- Ice Conditioner Actuation logic -------------
+    # def set_conditioner_position(self, target_position, duration_sec=3):
+    #     self.get_logger().info(f'Actuating conditioner to position: {target_position}')
         
-        point = JointTrajectoryPoint()
-        point.positions = [float(target_position)]
-        point.time_from_start.sec = int(duration_sec)
-        point.time_from_start.nanosec = 0
+    #     if not self._conditioner_client.wait_for_server(timeout_sec=2.0):
+    #         self.get_logger().error('Conditioner Action Server not available!')
+    #         return
+
+    #     goal_msg = FollowJointTrajectory.Goal()
+    #     goal_msg.trajectory.joint_names = ['conditioner_joint']
         
-        goal_msg.trajectory.points = [point]
+    #     point = JointTrajectoryPoint()
+    #     point.positions = [float(target_position)]
+    #     point.time_from_start.sec = int(duration_sec)
+    #     point.time_from_start.nanosec = 0
         
-        # We send it asynchronously so the Zamboni can keep driving while it lowers/raises!
-        self._conditioner_client.send_goal_async(goal_msg)
+    #     goal_msg.trajectory.points = [point]
+        
+    #     # We send it asynchronously so the Zamboni can keep driving while it lowers/raises!
+    #     self._conditioner_client.send_goal_async(goal_msg)
 
     # ============================================================
     # SHARED ODOMETRY CALLBACK (Traffic Controller)
@@ -365,8 +375,8 @@ class ZamboniMasterNode(Node):
             # Phase 2 Complete! Transition to Phase 3.
             if self.current_path_index >= len(self.path_x) - 5:
                 self.cmd_vel_pub.publish(Twist())
-                self.set_conditioner_position(-0.2) 
-                self.mission_state = 'TRANSITING_EXIT'
+                # self.set_conditioner_position(-0.2) 
+                self.set_and_publish_state('TRANSITING_EXIT')
                 self.get_logger().info('Resurfacing Complete! Initiating Phase 3 Exit Sequence...')
                 self.start_exit_maneuver_3a()
                 return
@@ -412,7 +422,7 @@ class ZamboniMasterNode(Node):
                 self.cmd_vel_pub.publish(twist)
             else:
                 self.cmd_vel_pub.publish(Twist())
-                self.mission_state = 'NAVIGATING'
+                self.set_and_publish_state('NAVIGATING')
                 self.get_logger().info(f'Safely reversed! (Yaw: {current_yaw:.2f}). Handing back to Nav2 for Final Park...')
                 self.start_exit_maneuver_3c()
             return
@@ -425,7 +435,7 @@ class ZamboniMasterNode(Node):
         self.get_logger().info('Phase 1A: Escaping the garage tunnel...')
         self._nav_to_pose_client.wait_for_server()
         
-        self.mission_state = 'TRANSITING_ESCAPE'
+        self.set_and_publish_state('TRANSITING_ESCAPE')
         
         target_x = -27.5
         target_y = -10.25 
@@ -444,7 +454,7 @@ class ZamboniMasterNode(Node):
         goal_handle = future.result()
         if not goal_handle.accepted:
             self.get_logger().error('Phase 1A Goal Rejected!')
-            self.mission_state = 'IDLE'
+            self.set_and_publish_state('IDLE')
             return
         get_result_future = goal_handle.get_result_async()
         get_result_future.add_done_callback(self._transit_1a_result_callback)
@@ -459,7 +469,7 @@ class ZamboniMasterNode(Node):
     # PHASE 1B: NAVIGATE TO STAGING (Center Ice)
     # ============================================================
     def start_phase_1b_staging(self):
-        self.mission_state = 'TRANSITING_STAGING'
+        self.set_and_publish_state('TRANSITING_STAGING')
         
         target_x = -13.0
         target_y = 0.0 - LANE_SPACING 
@@ -477,7 +487,7 @@ class ZamboniMasterNode(Node):
     def _transit_1b_goal_response_callback(self, future):
         goal_handle = future.result()
         if not goal_handle.accepted:
-            self.mission_state = 'IDLE'
+            self.set_and_publish_state('IDLE')
             return
         get_result_future = goal_handle.get_result_async()
         get_result_future.add_done_callback(self._transit_1b_result_callback)
@@ -495,14 +505,14 @@ class ZamboniMasterNode(Node):
         self.get_logger().info('Phase 2: Resurfacing Engaged...')
         px, py, pv = generate_zamboni_path()
 
-        self.set_conditioner_position(0.2)
+        # self.set_conditioner_position(0.2)
         self.path_x = np.array(px)
         self.path_y = np.array(py)
         self.path_v = np.array(pv)
         self.current_path_index = 0
         
         # This unlocks the odom_callback's Phase 2 block!
-        self.mission_state = 'RESURFACING'
+        self.set_and_publish_state('RESURFACING')
 
     # ============================================================
     # PHASE 3A: NAVIGATE OUT OF RINK
@@ -577,7 +587,7 @@ class ZamboniMasterNode(Node):
         self.delay_timer.cancel()
         self.get_logger().info('Wait complete. Engaging Manual Reverse Override...')
         # This unlocks the odom_callback's Phase 3 block!
-        self.mission_state = 'REVERSING_OUT_OF_PIT'
+        self.set_and_publish_state('REVERSING_OUT_OF_PIT')
 
     # ============================================================
     # PHASE 3C: FINAL PARK IN GARAGE

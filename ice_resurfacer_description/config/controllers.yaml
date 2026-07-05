@@ -12,6 +12,12 @@ controller_manager:
     conditioner_controller:
       type: joint_trajectory_controller/JointTrajectoryController
 
+    auger_velocity_controller:
+      type: velocity_controllers/JointGroupVelocityController
+
+    water_valve_controller:
+      type: position_controllers/JointGroupPositionController  
+
 ackermann_steering_controller:
   ros__parameters:
     # Frame IDs
@@ -46,3 +52,14 @@ conditioner_controller:
         p: 10000.0
         i: 0.0
         d: 100.0
+
+auger_velocity_controller:
+  ros__parameters:
+    joints:
+      - horizontal_auger_joint
+      - vertical_auger_joint
+
+water_valve_controller:
+  ros__parameters:
+    joints:
+      - water_valve_joint

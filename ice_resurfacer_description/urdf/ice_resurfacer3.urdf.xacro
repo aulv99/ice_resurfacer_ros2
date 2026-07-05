@@ -157,6 +157,44 @@
     <dynamics damping="50.0" friction="50.0"/>
   </joint>
 
+  <link name="horizontal_auger_link">
+    <xacro:cylinder_inertia m="15.0" r="0.12" h="2.0"/>
+  </link>
+
+  <joint name="horizontal_auger_joint" type="continuous">
+    <parent link="conditioner_link"/>
+    <child link="horizontal_auger_link"/>
+    <origin xyz="0.2 0 -0.1" rpy="0 1.5708 0"/> 
+    <axis xyz="0 0 1"/> <dynamics damping="5.0" friction="10.0"/>
+  </joint>
+
+  <link name="vertical_auger_link">
+    <xacro:cylinder_inertia m="10.0" r="0.12" h="1.5"/>
+  </link>
+
+  <joint name="vertical_auger_joint" type="continuous">
+    <parent link="conditioner_link"/>
+    <child link="vertical_auger_link"/>
+    <origin xyz="0.3 0 0.5" rpy="0 0.3 0"/>
+    <axis xyz="0 0 1"/>
+    <dynamics damping="5.0" friction="10.0"/>
+  </joint>
+
+  <link name="water_valve_link">
+    <inertial>
+      <mass value="0.1"/>
+      <inertia ixx="0.001" ixy="0" ixz="0" iyy="0.001" iyz="0" izz="0.001"/>
+    </inertial>
+  </link>
+
+  <joint name="water_valve_joint" type="revolute">
+    <parent link="conditioner_link"/>
+    <child link="water_valve_link"/>
+    <origin xyz="-0.2 0 0" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="0.0" upper="1.57" effort="10.0" velocity="2.0"/>
+  </joint>
+
   <link name="imu_link"/>
   <joint name="imu_joint" type="fixed">
     <parent link="base_link"/>
@@ -246,6 +284,34 @@
         <param name="initial_value">0.0</param>
       </state_interface>
     </joint>
+
+    <joint name="horizontal_auger_joint">
+      <command_interface name="velocity">
+        <param name="min">-20.0</param>
+        <param name="max">20.0</param>
+      </command_interface>
+      <state_interface name="velocity"/>
+      <state_interface name="position"/>
+    </joint>
+
+    <joint name="vertical_auger_joint">
+      <command_interface name="velocity">
+        <param name="min">-20.0</param>
+        <param name="max">20.0</param>
+      </command_interface>
+      <state_interface name="velocity"/>
+      <state_interface name="position"/>
+    </joint>
+
+    <joint name="water_valve_joint">
+      <command_interface name="position">
+        <param name="min">0.0</param>
+        <param name="max">1.57</param>
+      </command_interface>
+      <state_interface name="position">
+        <param name="initial_value">0.0</param>
+      </state_interface>
+    </joint>
   </ros2_control>
 
   <gazebo reference="base_link">
@@ -297,6 +363,8 @@
   <gazebo reference="conditioner_link">
     <material>Gazebo/Grey</material>
   </gazebo>
+
+  
 
   <gazebo>
     <plugin filename="libgz_ros2_control-system.so" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
