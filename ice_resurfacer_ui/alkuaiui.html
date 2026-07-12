@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>alkuAI UI</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- <span class="material-icons" style="color: #00e676; vertical-align: middle;">check_circle</span> -->
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Ubuntu:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/eventemitter2@6.4.9/lib/eventemitter2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/roslib@1/build/roslib.min.js"></script>
+</head>
+<body>
+    <img src="alkuAIlogocrop.png" id="brand-logo" alt="Zamboni Logo">
+
+    <div id="system-clock">--/--/---- --:--:--</div>
+
+    <h1>alkuAI Autopilot™</h1>
+
+    <div class="dashboard">
+        
+        <div class="panel">
+            <div class="chart-container">
+                <canvas id="positionChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <canvas id="velocityChart"></canvas>
+            </div>
+        </div>
+
+        <div class="panel">
+            <table class="measurement-table">
+                <tr><td>Linear Velocity</td><td id="val-lin-vel">0.0 m/s</td></tr>
+                <tr><td>Angular Velocity</td><td id="val-ang-vel">0.0 rad/s</td></tr>
+                <tr><td>Water Valve Pos</td><td id="val-valve">0%</td></tr>
+                <tr><td>Auger Speed</td><td id="val-auger">0.0 rad/s</td></tr>
+                <tr><td>Water Tank Level</td><td id="val-water">100%</td></tr>
+                <tr><td>Conditioner state</td><td id="val-cond">Up</td></tr>
+                <tr><td>Nav2 Status</td><td id="val-nav">Ok</td></tr>
+                <tr><td>Operation Status</td><td id="val-op">Idle</td></tr>
+                <tr><td>Engine Temperature</td><td id="val-eng-temp">80 °C</td></tr>
+                <tr><td>Ambient Temperature</td><td id="val-amb-temp">5 °C</td></tr>
+                <tr><td>Oil Temperature</td><td id="val-oil-temp">60 °C</td></tr>
+            </table>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+            
+            <div class="panel" style="height: 250px;">
+                <div class="alarm-header">
+                    <span>Alarm</span>
+                    <span>Source</span>
+                </div>
+                <ul class="alarm-list" id="alarm-list">
+                    <li><span>Goal rejected by Nav2</span><span>Nav2</span></li>
+                </ul>
+            </div>
+
+            <div class="panel operations-panel" style="height: 250px;">
+                <div style="text-align: center; font-size: 1.1rem; margin-bottom: 30px;">Operation Mode: Auto</div>
+                
+                <div style="text-align: center; font-size: 1.1rem; margin-bottom: 5px;">Resurfacing Sequence</div>
+                <div class="button-group">
+                    <button onclick="startSequence()">Start</button>
+                    <button onclick="stopSequence()">Stop</button>
+                </div>
+            </div>
+
+            
+
+        </div>
+        <footer>
+            <p>© 2026 alkuAI</p>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+    
+</body>
+
+</html>

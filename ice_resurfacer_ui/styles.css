@@ -1,0 +1,160 @@
+:root {
+    --bg-dark: #111111;
+    --panel-bg: #1c1c1e; /* Matching your grey mockup */
+    --text-dark: #000000;
+    --accent-blue: #a1b9ce;
+    --accent-red: #ca0028;
+    --font-main: 'Ubuntu', sans-serif;
+}
+
+#system-clock {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    font-family: 'Ubuntu'; 
+    font-size: 0.9rem;
+    color: var(--accent-blue); /* Faded grey so it doesn't distract from the main data */
+    letter-spacing: 0px;
+}
+
+#brand-logo {
+    position: absolute;
+    top: 0px;
+    left: 15px;
+    height: 100px; /* Adjust this to make your logo bigger or smaller */
+    width: auto;  /* Keeps the aspect ratio from stretching */
+    opacity: 0.9; /* Slight transparency to match the modern UI vibe */
+}
+
+body {
+    background-color: var(--bg-dark);
+    color: var(--text-dark);
+    font-family: var(--font-main);
+    margin: 0;
+    padding: 20px;
+}
+
+h1 {
+    text-align: center;
+    color: var(--accent-blue);
+    /* text-transform: uppercase; */
+    letter-spacing: 2px;
+    margin-bottom: 30px;
+}
+
+footer {
+    position: absolute;
+    top: 866px;
+    right: 1750px;
+    color: var(--accent-blue);
+}
+
+/* 3-Column Grid Layout */
+.dashboard {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 30px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.panel {
+    background-color: rgba(30, 30, 32, 0.85);
+    backdrop-filter: blur(10px);
+    /* border: 4px solid #555; */
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    border-radius: 12px;
+}
+
+/* Left Column: Charts */
+.chart-container {
+    position: relative;
+    height: 250px;
+    width: 100%;
+    overflow: hidden;
+    background-color: rgba(10, 10, 10, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+}
+
+/* Middle Column: Measurements */
+.measurement-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 1.1rem;
+}
+.measurement-table td {
+    padding: 14px 1px;
+    border-bottom: 1px solid #888;
+    color: #7e7e7e;
+}
+.measurement-table td:nth-child(2) {
+    text-align: right;
+    font-family: sans-serif;
+    font-weight: bold;
+    font-size: 1.2rem;
+    color: #7e7e7e;
+}
+
+/* Right Column: Alarms & Operations */
+.alarm-header {
+    display: flex;
+    justify-content: space-between;
+    /* color: var(--accent-red); */
+    color: #727272;
+    font-weight: bold;
+    /* border-bottom: 2px solid var(--accent-red); */
+    border-bottom: 2px solid #727272;
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+}
+.alarm-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    height: 200px;
+    overflow-y: auto;
+    /* color: var(--accent-red); */
+    color: #727272;
+}
+.alarm-list li {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+}
+
+.operations-panel {
+    margin-top: auto; /* Pushes to bottom */
+    color: #7e7e7e;
+}
+.button-group {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.status-active {
+    color: #00FF66; /* Vibrant Green */
+    text-shadow: 0 0 8px rgba(0, 255, 102, 0.4);
+}
+
+button {
+    padding: 10px 30px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    /* border: 1px solid rgba(255, 255, 255, 0.05); */
+    background-color: #a3a3a3;
+    border-radius: 12px;
+}
+
+
+button:hover { 
+    background-color: rgba(214, 214, 214, 0.2); /* Slight blue glow on hover */
+}
+button:active { background-color: #999; }
