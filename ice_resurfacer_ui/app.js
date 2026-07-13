@@ -10,7 +10,7 @@ const positionChart = new Chart(ctxPos, {
             backgroundColor: '#3399FF',
             showLine: false, // Connect the dots!
             borderWidth: 0,
-            pointRadius: 6,
+            pointRadius: 1,
             pointHoverRadius: 8
         }]
     },
@@ -18,11 +18,11 @@ const positionChart = new Chart(ctxPos, {
         responsive: true,
         maintainAspectRatio: false,
         scales: {
-            x: { min: -50, max: 35, title: {display: true, text: 'Rink Length (m)', color: '#aaaaaa'}, 
+            x: { min: -30, max: 30, title: {display: true, text: 'Kaukalon pituus (m)', color: '#aaaaaa'}, 
             grid: { color: 'rgba(255, 255, 255, 0.1)' }, // Faint white gridlines
             ticks: { color: '#888888' }
             },
-            y: { min: -25, max: 20, title: {display: true, text: 'Rink Width (m)', color: '#aaaaaa'}, 
+            y: { min: -15, max: 15, title: {display: true, text: 'Kaukalon leveys (m)', color: '#aaaaaa'}, 
             grid: { color: 'rgba(255, 255, 255, 0.1)' }, 
             ticks: { color: '#888888' }
             }
@@ -53,7 +53,7 @@ const velocityChart = new Chart(ctxVel, {
         maintainAspectRatio: false,
         scales: {
             y: { 
-                min: 0, max: 3, 
+                min: 0, max: 8, 
                 title: {display: true, text: 'Velocity (m/s)', color: '#aaaaaa'},
                 grid: { color: 'rgba(255, 255, 255, 0.1)' },
                 ticks: { color: '#888888' }
@@ -73,30 +73,30 @@ let timeTick = 0;
 let waterLevel = 100;
 let pathData = [];
 
-function startSequence() {
-    isRunning = true;
-    document.getElementById('val-op').innerText = "Resurfacing";
-    document.getElementById('val-cond').innerText = "Down";
-    document.getElementById('val-nav').innerText = "Active";
-    document.getElementById('val-valve').innerText = "90%";
-    document.getElementById('val-auger').innerText = "15.0 rad/s";
+// function startSequence() {
+//     isRunning = true;
+//     document.getElementById('val-op').innerText = "Resurfacing";
+//     document.getElementById('val-cond').innerText = "Down";
+//     document.getElementById('val-nav').innerText = "Active";
+//     document.getElementById('val-valve').innerText = "90%";
+//     document.getElementById('val-auger').innerText = "15.0 rad/s";
     
-    // Clear old alarms
-    document.getElementById('alarm-list').innerHTML = "";
-    pathData = []; // Clear old path
-}
+//     // Clear old alarms
+//     document.getElementById('alarm-list').innerHTML = "";
+//     pathData = []; // Clear old path
+// }
 
-function stopSequence() {
-    if (!isRunning) return; // Don't do anything if it's already stopped
+// function stopSequence() {
+//     if (!isRunning) return; // Don't do anything if it's already stopped
     
-    isRunning = false;
-    document.getElementById('val-op').innerText = "Manual Override";
-    document.getElementById('val-cond').innerText = "Up";
-    document.getElementById('val-nav').innerText = "Aborted";
+//     isRunning = false;
+//     document.getElementById('val-op').innerText = "Manual Override";
+//     document.getElementById('val-cond').innerText = "Up";
+//     document.getElementById('val-nav').innerText = "Aborted";
     
-    // Trigger our new dynamic alarm!
-    triggerAlarm("E-STOP: Operator halted sequence", "HMI Panel");
-}
+//     // Trigger our new dynamic alarm!
+//     triggerAlarm("E-STOP: Operator halted sequence", "HMI Panel");
+// }
 
 // ==========================================
 // ROS 2 CONNECTION MANAGER
@@ -107,19 +107,19 @@ const ros = new ROSLIB.Ros({
 
 ros.on('connection', () => {
     console.log('Connected to websocket server.');
-    document.getElementById('val-nav').innerText = "Connected";
+    document.getElementById('val-nav').innerText = "Yhdistetty";
     document.getElementById('val-nav').style.color = "#00E676"; // Neon Green
 });
 
 ros.on('error', (error) => {
     console.log('Error connecting to websocket server: ', error);
-    document.getElementById('val-nav').innerText = "Comms Error";
+    document.getElementById('val-nav').innerText = "Kommunikaatiovirhe";
     document.getElementById('val-nav').style.color = "#ff1744"; // Red
 });
 
 ros.on('close', () => {
     console.log('Connection to websocket server closed.');
-    document.getElementById('val-nav').innerText = "Offline";
+    document.getElementById('val-nav').innerText = "Ei yhteyttä";
     document.getElementById('val-nav').style.color = "#888";
 });
 
@@ -131,7 +131,27 @@ const stateListener = new ROSLIB.Topic({
 
 stateListener.subscribe((message) => {
     // message.data contains your string (e.g., 'RESURFACING')
-    document.getElementById('val-op').innerText = message.data;
+    let operationState = message.data;
+    let operaatio = "Vikatilanne"
+
+    if (operationState == 'RESURFACING') {
+        operaatio = "Ajetaan jäätä"
+    } else if (operationState == 'IDLE') {
+        operaatio = "Valmiudessa"
+    } else if (operationState == 'TRANSITING_EXIT') {
+        operaatio = "Ajetaan ulos jäältä"
+    } else if (operationState == 'REVERSING_OUT_OF_PIT') {
+        operaatio = "Poistutaan lumikasalta"
+    } else if (operationState == 'TRANSITING_ESCAPE') {
+        operaatio = "Ajetaan jäälle"
+    } else if (operationState == 'NAVIGATING') {
+        operaatio = "Ajetaan talliin"
+    } else if (operationState == 'TRANSITING_STAGING') {
+        operaatio = "Valmistellaan jäänajoa"
+    } else {
+        operaatio = "Virhe"
+    }
+    document.getElementById('val-op').innerText = operaatio;
 });
 
 const velocityListener = new ROSLIB.Topic({
@@ -144,12 +164,6 @@ velocityListener.subscribe((message) => {
     // 1. Update text UI
     let currentVel = message.linear.x;
     document.getElementById('val-lin-vel').innerText = currentVel.toFixed(2) + " m/s";
-
-    // 2. Update Chart.js
-    let velData = velocityChart.data.datasets[0].data;
-    velData.push(currentVel);
-    velData.shift(); 
-    velocityChart.update();
 });
 
 const odomListener = new ROSLIB.Topic({
@@ -162,9 +176,99 @@ odomListener.subscribe((message) => {
     let posX = message.pose.pose.position.x;
     let posY = message.pose.pose.position.y;
 
-    // Update the single dot on the Position Chart
-    positionChart.data.datasets[0].data = [{x: posX, y: posY}];
+    let realVel = message.twist.twist.linear.x * 3.6;
+    document.getElementById('val-fb-vel').innerText = realVel.toFixed(2) + " km/h";  
+
+    let posData = positionChart.data.datasets[0].data;
+    posData.push({x: posX, y: posY});
+    if (posData.length > 100) {
+        posData.shift(); 
+    }
     positionChart.update();
+
+    let velData = velocityChart.data.datasets[0].data;
+    velData.push(realVel);
+    velData.shift(); 
+    velocityChart.update()
+});
+
+
+// Conditioner state
+ const conditionerListener = new ROSLIB.Topic({
+    ros : ros,
+    name: '/conditioner_controller/controller_state',
+    messageType : 'control_msgs/msg/JointTrajectoryControllerState'
+ });
+
+ conditionerListener.subscribe((message) => {
+    let condPos = message.feedback.positions[0];
+
+    // state logic
+    let stateText = "Asentovirhe"
+    if (condPos > 0.1) {
+        stateText = "Alhalla"
+    } else {
+        stateText = "Ylhällä"
+    }
+    document.getElementById('val-cond').innerText = stateText;
+ });
+
+ // Water valve state
+ const valveListener = new ROSLIB.Topic({
+    ros : ros,
+    name: '/water_valve_controller/commands',
+    messageType: 'std_msgs/Float64MultiArray'
+ });
+
+ valveListener.subscribe((message) => {
+    let valvePos = message.data[0];
+
+    document.getElementById('val-valve').innerText = (valvePos * 100).toFixed(0) + "%";  
+ });
+
+ // Auger state
+ // Water valve state
+ const augerListener = new ROSLIB.Topic({
+    ros : ros,
+    name: '/auger_velocity_controller/commands',
+    messageType: 'std_msgs/Float64MultiArray'
+ });
+
+ valveListener.subscribe((message) => {
+    let valvePos = message.data[0];
+
+    document.getElementById('val-auger').innerText = valvePos.toFixed(0) + " rad/s";  
+ });
+
+ // ==========================================
+// DIAGNOSTICS & ALARMS LISTENER
+// ==========================================
+const diagnosticListener = new ROSLIB.Topic({
+    ros : ros,
+    name : '/diagnostics',
+    messageType : 'diagnostic_msgs/DiagnosticArray' // Standard ROS diagnostic type
+});
+
+diagnosticListener.subscribe((message) => {
+    // Loop through every status reported in the array
+    message.status.forEach((status) => {
+        
+        // Diagnostic Levels: 0=OK, 1=WARN, 2=ERROR, 3=STALE
+        // We only care if something is wrong (Level > 0)
+        if (status.level > 0) {
+            
+            // Anti-Spam Filter: Diagnostics publish constantly. 
+            // We only want to push to the UI if it's a NEW alarm, 
+            // or we will crash the browser with thousands of list items.
+            if (alarmQueue.length === 0 || alarmQueue[0].desc !== status.message) {
+                
+                // Call your existing function!
+                // status.message = The error text (e.g., "Goal Rejected")
+                // status.name = The node reporting it (e.g., "bt_navigator")
+                triggerAlarm(status.message, status.name);
+            }
+        }
+    });
 });
 
 // ==========================================

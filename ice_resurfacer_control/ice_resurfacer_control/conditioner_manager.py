@@ -18,7 +18,7 @@ class ConditionerManager(Node):
         # STATE TRACKING
         # ---------------------------------------------------------
         self.current_mission_state = 'IDLE'
-        self.MAX_WATER_VALVE_OPENING = 1.57 # 90 degrees in radians
+        self.MAX_WATER_VALVE_OPENING = 1.00 # 90 degrees in radians
         self.MAX_AUGER_SPEED = 15.0         # rad/s
 
         # ---------------------------------------------------------
@@ -87,7 +87,7 @@ class ConditionerManager(Node):
     def velocity_callback(self, msg):
         """ Feedforward control for the water valve based on vehicle speed and auger control"""
         if self.current_mission_state == 'RESURFACING':
-            current_speed = msg.linear.x
+            current_speed = abs(msg.linear.x) # Added absolute value to avoid issues reversing
             MAX_VEHICLE_SPEED = 2.0
             speed_ratio = min(current_speed / MAX_VEHICLE_SPEED, 1.0)
             # Map to the 90-degree valve opening
@@ -110,7 +110,7 @@ class ConditionerManager(Node):
         self.auger_pub.publish(msg)
 
     def set_water_valve(self, position_rad):
-        """ Publishes the target position (0.0 to 1.57) to the water valve """
+        """ Publishes the target position (0.0 to 1.00) to the water valve """
         msg = Float64MultiArray()
         msg.data = [float(position_rad)]
         self.water_pub.publish(msg)

@@ -148,7 +148,7 @@
         <visual name="utilities_visual">
           <geometry>
             <mesh>
-              <uri>model://ice_resurfacer_gazebo/meshes/utilities_260622.stl</uri>
+              <uri>model://ice_resurfacer_gazebo/meshes/buildings.stl</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -160,7 +160,7 @@
         <collision name="utilities_collision">
           <geometry>
             <mesh>
-              <uri>model://ice_resurfacer_gazebo/meshes/utilities_260622.stl</uri>
+              <uri>model://ice_resurfacer_gazebo/meshes/buildings.stl</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>

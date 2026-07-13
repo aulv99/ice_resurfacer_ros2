@@ -43,19 +43,23 @@ h1 {
 }
 
 footer {
-    position: absolute;
-    top: 866px;
-    right: 1750px;
+    text-align: center;
     color: var(--accent-blue);
+    margin-top: 40px;
+    width: 100%;
+
 }
 
 /* 3-Column Grid Layout */
 .dashboard {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 30px;
-    max-width: 1400px;
+    grid-template-columns: 1fr 1fr minmax(380px, 2fr); /* guarantee min width for alarms */
+    grid-template-rows: 1fr; /* single row that stretches */
+    align-items: stretch; /* allow grid items to stretch vertically */
+    gap: 20px;
+    max-width: 1600px; /* You may want to increase this slightly if it feels too squeezed */
     margin: 0 auto;
+    min-height: 520px; /* ensure there's room for panels to stretch */
 }
 
 .panel {
@@ -68,6 +72,7 @@ footer {
     flex-direction: column;
     gap: 15px;
     border-radius: 12px;
+    min-width: 0; /* allow grid/flex children to shrink instead of overflowing */
 }
 
 /* Left Column: Charts */
@@ -79,6 +84,14 @@ footer {
     background-color: rgba(10, 10, 10, 0.85);
     border: 1px solid rgba(255, 255, 255, 0.05);
     border-radius: 12px;
+    min-width: 0; /* prevents canvas from forcing the panel wider */
+}
+
+/* Constrain the canvas so Chart.js resizing cannot exceed its container */
+.chart-container canvas {
+    max-width: 100% !important;
+    height: 100% !important;
+    object-fit: contain;
 }
 
 /* Middle Column: Measurements */
@@ -112,19 +125,49 @@ footer {
     padding-bottom: 5px;
     margin-bottom: 10px;
 }
+
 .alarm-list {
     list-style: none;
     padding: 0;
-    margin: 0;
-    height: 200px;
-    overflow-y: auto;
-    /* color: var(--accent-red); */
-    color: #727272;
+    margin: 5px 0 0 0;
+    
+    /* The Rolling Text Box Magic */
+    flex-grow: 1;       /* Tells the list to fill all remaining empty space */
+    height: 0;          /* Crucial: prevents the list from breaking out of the panel */
+    overflow-y: auto;   
+    overflow-x: hidden; /* Hides the ugly horizontal scrollbar */
+    
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
 }
 .alarm-list li {
     display: flex;
     justify-content: space-between;
     margin-bottom: 5px;
+    word-break: break-word; /* Forces long ROS 2 topic names to wrap */
+    gap: 15px; /* Adds a little breathing room between the alarm and the source */
+}
+
+/* Give the middle (message) span flexible space so long messages wrap nicely
+   and the source label remains compact on the right */
+.alarm-list li span:nth-child(1) {
+    color: #888;
+    flex: 0 0 auto; /* timestamp */
+}
+.alarm-list li span:nth-child(2) {
+    flex: 1 1 auto; /* message - flexible */
+    padding: 0 10px;
+}
+.alarm-list li span:nth-child(3) {
+    flex: 0 0 auto; /* source */
+    font-weight: bold;
+}
+
+.alarm-panel {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }
 
 .operations-panel {
