@@ -2,7 +2,7 @@
 
 import rclpy
 from rclpy.node import Node
-from std_msgs.msg import String, Float64MultiArray
+from std_msgs.msg import String, Float64MultiArray, Float64
 from geometry_msgs.msg import Twist
 from rclpy.action import ActionClient
 from control_msgs.action import FollowJointTrajectory
@@ -18,8 +18,18 @@ class ConditionerManager(Node):
         # STATE TRACKING
         # ---------------------------------------------------------
         self.current_mission_state = 'IDLE'
-        self.MAX_WATER_VALVE_OPENING = 1.00 # 90 degrees in radians
+        self.MAX_WATER_VALVE_OPENING = 1.00 # 0-100 % Open
         self.MAX_AUGER_SPEED = 15.0         # rad/s
+        self.MAX_TANK_CAPACITY = 727.0
+        self.current_water_capacity = self.MAX_TANK_CAPACITY
+        self.WATER_FLOW_RATE = 0.1
+        self.current_valve_opening = 0.0
+
+        # --------------------------------
+        # Control Loop
+        # --------------------------------
+        self.dt = 0.1  # 0.1 seconds = 10Hz loop rate
+        self.timer = self.create_timer(self.dt, self.control_loop)
 
         # ---------------------------------------------------------
         # SUBSCRIBERS (Listening to the Master Node & Chassis)
@@ -52,6 +62,12 @@ class ConditionerManager(Node):
         self.water_pub = self.create_publisher(
             Float64MultiArray, 
             '/water_valve_controller/commands', 
+            10
+        )
+
+        self.tank_level_pub = self.create_publisher(
+            Float64,
+            '/water_tank_level',
             10
         )
 
@@ -92,6 +108,7 @@ class ConditionerManager(Node):
             speed_ratio = min(current_speed / MAX_VEHICLE_SPEED, 1.0)
             # Map to the 90-degree valve opening
             valve_position = speed_ratio * self.MAX_WATER_VALVE_OPENING
+            self.current_valve_opening = speed_ratio
             
             self.set_water_valve(valve_position)
             self.set_auger_speed(self.MAX_AUGER_SPEED)
@@ -129,6 +146,23 @@ class ConditionerManager(Node):
         
         goal_msg.trajectory.points = [point]
         self._conditioner_client.send_goal_async(goal_msg)
+    
+    def control_loop(self):
+        """This function runs automatically every 0.1 seconds."""
+        
+        # 1. Calculate how much water we sprayed in the last 0.1 seconds
+        water_consumed = self.current_valve_opening * self.WATER_FLOW_RATE * self.dt
+        
+        # 2. Drain the tank (using max() so it never goes below 0)
+        self.current_water_capacity = max(self.current_water_capacity - water_consumed, 0.0)
+        
+        # 3. Calculate the percentage for the UI (0.0 to 100.0)
+        tank_percentage = (self.current_water_capacity / self.MAX_TANK_CAPACITY) * 100.0
+        
+        # 4. Publish it to the ROS 2 network
+        msg = Float64()
+        msg.data = tank_percentage
+        self.tank_level_pub.publish(msg)
 
 def main(args=None):
     rclpy.init(args=args)

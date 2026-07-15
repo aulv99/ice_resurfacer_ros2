@@ -54,7 +54,7 @@ const velocityChart = new Chart(ctxVel, {
         scales: {
             y: { 
                 min: 0, max: 8, 
-                title: {display: true, text: 'Velocity (m/s)', color: '#aaaaaa'},
+                title: {display: true, text: 'Nopeus (km/h)', color: '#aaaaaa'},
                 grid: { color: 'rgba(255, 255, 255, 0.1)' },
                 ticks: { color: '#888888' }
             },
@@ -181,7 +181,7 @@ odomListener.subscribe((message) => {
 
     let posData = positionChart.data.datasets[0].data;
     posData.push({x: posX, y: posY});
-    if (posData.length > 100) {
+    if (posData.length > 10000) {
         posData.shift(); 
     }
     positionChart.update();
@@ -194,13 +194,13 @@ odomListener.subscribe((message) => {
 
 
 // Conditioner state
- const conditionerListener = new ROSLIB.Topic({
+const conditionerListener = new ROSLIB.Topic({
     ros : ros,
     name: '/conditioner_controller/controller_state',
-    messageType : 'control_msgs/msg/JointTrajectoryControllerState'
- });
+    messageType : 'control_msgs/JointTrajectoryControllerState'
+});
 
- conditionerListener.subscribe((message) => {
+conditionerListener.subscribe((message) => {
     let condPos = message.feedback.positions[0];
 
     // state logic
@@ -211,34 +211,45 @@ odomListener.subscribe((message) => {
         stateText = "Ylhällä"
     }
     document.getElementById('val-cond').innerText = stateText;
- });
+});
 
- // Water valve state
- const valveListener = new ROSLIB.Topic({
+// Water valve state
+const valveListener = new ROSLIB.Topic({
     ros : ros,
     name: '/water_valve_controller/commands',
     messageType: 'std_msgs/Float64MultiArray'
- });
+});
 
- valveListener.subscribe((message) => {
+valveListener.subscribe((message) => {
     let valvePos = message.data[0];
 
     document.getElementById('val-valve').innerText = (valvePos * 100).toFixed(0) + "%";  
- });
+});
 
- // Auger state
- // Water valve state
- const augerListener = new ROSLIB.Topic({
+// Auger state
+const augerListener = new ROSLIB.Topic({
     ros : ros,
     name: '/auger_velocity_controller/commands',
     messageType: 'std_msgs/Float64MultiArray'
- });
+});
 
- valveListener.subscribe((message) => {
-    let valvePos = message.data[0];
+augerListener.subscribe((message) => {
+    let augerSpeed = message.data[0];
 
-    document.getElementById('val-auger').innerText = valvePos.toFixed(0) + " rad/s";  
- });
+    document.getElementById('val-auger').innerText = augerSpeed.toFixed(0) + " rad/s";  
+});
+
+// Water Tank Level
+const tankListener = new ROSLIB.Topic({
+    ros : ros,
+    name: '/water_tank_level',
+    messageType: 'std_msgs/Float64'
+});
+
+tankListener.subscribe((message) => {
+    // Formatting to 0 decimals so it reads smoothly like "98%"
+    document.getElementById('val-water').innerText = message.data.toFixed(0) + " %";  
+});
 
  // ==========================================
 // DIAGNOSTICS & ALARMS LISTENER
@@ -257,6 +268,11 @@ diagnosticListener.subscribe((message) => {
         // We only care if something is wrong (Level > 0)
         if (status.level > 0) {
             
+
+            if (status.message.includes("High execution jitter") || 
+                status.message.includes("No events recorded")) {
+                return; // Skips the rest of the loop for this specific message
+            }
             // Anti-Spam Filter: Diagnostics publish constantly. 
             // We only want to push to the UI if it's a NEW alarm, 
             // or we will crash the browser with thousands of list items.

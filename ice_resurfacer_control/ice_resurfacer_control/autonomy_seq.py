@@ -322,7 +322,7 @@ class ZamboniMasterNode(Node):
         msg = String()
         msg.data = new_state
         self.state_pub.publish(msg)
-        self.get_logger().info(f">>> STATE CHANGED: {new_state} <<<")  
+        self.get_logger().info(f"Tila vaihtunut: {new_state} ")  
 
     # ------------- Ice Conditioner Actuation logic -------------
     # def set_conditioner_position(self, target_position, duration_sec=3):
@@ -377,7 +377,7 @@ class ZamboniMasterNode(Node):
                 self.cmd_vel_pub.publish(Twist())
                 # self.set_conditioner_position(-0.2) 
                 self.set_and_publish_state('TRANSITING_EXIT')
-                self.get_logger().info('Resurfacing Complete! Initiating Phase 3 Exit Sequence...')
+                self.get_logger().info('Jäänajo valmis. Ajetaan pois jäältä')
                 self.start_exit_maneuver_3a()
                 return
 
@@ -423,7 +423,7 @@ class ZamboniMasterNode(Node):
             else:
                 self.cmd_vel_pub.publish(Twist())
                 self.set_and_publish_state('NAVIGATING')
-                self.get_logger().info(f'Safely reversed! (Yaw: {current_yaw:.2f}). Handing back to Nav2 for Final Park...')
+                self.get_logger().info(f'Peruutettu lumikasalta. (Yaw: {current_yaw:.2f}). Ajetaan talliin')
                 self.start_exit_maneuver_3c()
             return
 
@@ -432,7 +432,7 @@ class ZamboniMasterNode(Node):
     # PHASE 1A: ESCAPING THE TUNNEL
     # ============================================================
     def start_phase_1_transit(self):
-        self.get_logger().info('Phase 1A: Escaping the garage tunnel...')
+        self.get_logger().info('Vaihe 1A: Ajetaan tallista jäälle')
         self._nav_to_pose_client.wait_for_server()
         
         self.set_and_publish_state('TRANSITING_ESCAPE')
@@ -462,7 +462,7 @@ class ZamboniMasterNode(Node):
     def _transit_1a_result_callback(self, future):
         result = future.result()
         if result.status == GoalStatus.STATUS_SUCCEEDED:
-            self.get_logger().info('Garage cleared! Moving to Step 1B...')
+            self.get_logger().info('Jääkone jäällä. Siirrytään 1B vaiheeseen')
             self.start_phase_1b_staging()
 
     # ============================================================
@@ -495,14 +495,14 @@ class ZamboniMasterNode(Node):
     def _transit_1b_result_callback(self, future):
         result = future.result()
         if result.status == GoalStatus.STATUS_SUCCEEDED:
-            self.get_logger().info('Step 1B Complete. Handing off to custom Pure Pursuit...')
+            self.get_logger().info('Vaihe 1B valmis. Valmistaudutaan jäänajoon...')
             self.start_phase_2_resurfacing()
 
     # ============================================================
     # PHASE 2: INITIATING RIGID RESURFACING
     # ============================================================
     def start_phase_2_resurfacing(self):
-        self.get_logger().info('Phase 2: Resurfacing Engaged...')
+        self.get_logger().info('Vaihe 2: Jäänajoaloitettu...')
         px, py, pv = generate_zamboni_path()
 
         # self.set_conditioner_position(0.2)
@@ -518,7 +518,7 @@ class ZamboniMasterNode(Node):
     # PHASE 3A: NAVIGATE OUT OF RINK
     # ============================================================
     def start_exit_maneuver_3a(self):
-        self.get_logger().info('Phase 3A: Generating dynamic route back to Garage Tunnel...')
+        self.get_logger().info('Vaihe 3A. Ajetaan ulos jäältä')
 
         target_x = -34.5
         target_y = -10.25
@@ -545,14 +545,14 @@ class ZamboniMasterNode(Node):
     def _exit_result_3a_callback(self, future):
         result = future.result()
         if result.status == GoalStatus.STATUS_SUCCEEDED:
-            self.get_logger().info('Phase 3A Complete! Zamboni has cleared the tunnel.')
+            self.get_logger().info('Vaihe 3A valmis. Jääkone on tallissa')
             self.start_exit_maneuver_3b()
 
     # ============================================================
     # PHASE 3B: NAVIGATE TO SNOW UNLOAD STATION
     # ============================================================
     def start_exit_maneuver_3b(self):
-        self.get_logger().info('Phase 3B: Transitioning to Snow Unload Station...')
+        self.get_logger().info('Vaihe 3B: Ajetaan lumentyhjäyspaikalle')
 
         target_x = -41.50
         target_y = -20.0
@@ -579,13 +579,13 @@ class ZamboniMasterNode(Node):
     def _exit_result_3b_callback(self, future):
         result = future.result()
         if result.status == GoalStatus.STATUS_SUCCEEDED:
-            self.get_logger().info('Unloading Snow. Waiting 3 seconds for the pit to clear...')
+            self.get_logger().info('Tyhjennetään lumisäilötä')
             self.cmd_vel_pub.publish(Twist())
             self.delay_timer = self.create_timer(3.0, self._trigger_manual_reverse)
 
     def _trigger_manual_reverse(self):
         self.delay_timer.cancel()
-        self.get_logger().info('Wait complete. Engaging Manual Reverse Override...')
+        self.get_logger().info('Lumisäiliö tyhjennetty. Peruutetaan ja käännetään jääkone')
         # This unlocks the odom_callback's Phase 3 block!
         self.set_and_publish_state('REVERSING_OUT_OF_PIT')
 
@@ -593,7 +593,7 @@ class ZamboniMasterNode(Node):
     # PHASE 3C: FINAL PARK IN GARAGE
     # ============================================================
     def start_exit_maneuver_3c(self):
-        self.get_logger().info('Phase 3C: Driving back to garage...')
+        self.get_logger().info('Vaihe 3C. Ajetaan takaisin talliin')
 
         target_x = -34.5
         target_y = -10.25
@@ -620,7 +620,8 @@ class ZamboniMasterNode(Node):
     def _exit_result_3c_callback(self, future):
         result = future.result()
         if result.status == GoalStatus.STATUS_SUCCEEDED:
-            self.get_logger().info('MISSION COMPLETE! Zamboni is powered down and parked.')
+            self.set_and_publish_state('IDLE')
+            self.get_logger().info('Valmista tuli. Jää on ajettu ja jääkone tallissa')
 
 def main(args=None):
     rclpy.init(args=args)

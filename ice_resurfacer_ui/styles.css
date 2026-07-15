@@ -1,7 +1,7 @@
 :root {
     --bg-dark: #111111;
-    --panel-bg: #1c1c1e; /* Matching your grey mockup */
-    --text-dark: #000000;
+    --panel-bg: #1c1c1e; 
+    --text-main: #e0e0e0; /* Changed from black to light gray */
     --accent-blue: #a1b9ce;
     --accent-red: #ca0028;
     --font-main: 'Ubuntu', sans-serif;
@@ -28,7 +28,7 @@
 
 body {
     background-color: var(--bg-dark);
-    color: var(--text-dark);
+    color: var(--text-main); /* Make sure this matches the new variable name */
     font-family: var(--font-main);
     margin: 0;
     padding: 20px;
@@ -73,6 +73,7 @@ footer {
     gap: 15px;
     border-radius: 12px;
     min-width: 0; /* allow grid/flex children to shrink instead of overflowing */
+    min-height: 0;
 }
 
 /* Left Column: Charts */
@@ -164,11 +165,7 @@ footer {
     font-weight: bold;
 }
 
-.alarm-panel {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-}
+
 
 .operations-panel {
     margin-top: auto; /* Pushes to bottom */
