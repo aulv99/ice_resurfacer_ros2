@@ -12,7 +12,7 @@ class ConditionerManager(Node):
     def __init__(self):
         super().__init__('conditioner_manager')
         
-        self.get_logger().info("Conditioner Manager Node starting up...")
+        self.get_logger().info("Jäänhoitolaitteisto käynnistyy...")
 
         # ---------------------------------------------------------
         # STATE TRACKING
@@ -90,12 +90,12 @@ class ConditionerManager(Node):
         self.current_mission_state = msg.data
 
         if self.current_mission_state == 'RESURFACING' and previous_state != 'RESURFACING':
-            self.get_logger().info("Conditioner engaged: Dropping blade and starting augers.")
+            self.get_logger().info("Lasketaan jäädytin ja käynnistetään lumikairat.")
             self.set_conditioner_lift(0.2)  # Drop blade
             # self.set_auger_speed(self.MAX_AUGER_SPEED)
             
         elif self.current_mission_state in ['TRANSITING_EXIT', 'IDLE'] and previous_state == 'RESURFACING':
-            self.get_logger().info("Conditioner disengaged: Lifting blade, stopping augers, shutting water.")
+            self.get_logger().info("Nostetaan jäädytin, pysäytetään lumikairat, ja katkaistaan vesisyöttö")
             self.set_conditioner_lift(-0.2) # Lift blade
             # self.set_auger_speed(0.0)
             # self.set_water_valve(0.0)

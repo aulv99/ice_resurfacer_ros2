@@ -53,7 +53,8 @@ footer {
 /* 3-Column Grid Layout */
 .dashboard {
     display: grid;
-    grid-template-columns: 1fr 1fr minmax(380px, 2fr); /* guarantee min width for alarms */
+    /* grid-template-columns: 1fr 1fr minmax(380px, 2fr); guarantee min width for alarms */
+    grid-template-columns: 1fr 1fr 1fr;
     grid-template-rows: 1fr; /* single row that stretches */
     align-items: stretch; /* allow grid items to stretch vertically */
     gap: 20px;
@@ -198,3 +199,43 @@ button:hover {
     background-color: rgba(214, 214, 214, 0.2); /* Slight blue glow on hover */
 }
 button:active { background-color: #999; }
+
+/* ========================================== */
+/* TERMINAL CONSOLE STYLES */
+/* ========================================== */
+.terminal-panel {
+    margin: 20px auto;
+    max-width: 1600px;
+    height: 220px; /* Fixed height so it doesn't take over the screen */
+    background-color: #0a0a0c; /* Very dark, almost true black */
+    font-family: 'Courier New', Courier, monospace; /* Classic terminal font */
+}
+
+.terminal-header {
+    color: #727272;
+    border-bottom: 1px solid #333;
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+    font-family: var(--font-main);
+    font-weight: bold;
+}
+
+.terminal-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    
+    height: 100%;
+    overflow-y: auto;   /* Scrollbar enabled */
+    overflow-x: hidden; 
+    
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 0.85rem;
+}
+
+/* Color coding based on ROS 2 Log Severity */
+.log-info { color: #a1b9ce; } /* Matches your accent blue */
+.log-warn { color: #ffeb3b; } /* Yellow */
+.log-error { color: #ff1744; font-weight: bold; } /* Red */

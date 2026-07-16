@@ -288,6 +288,68 @@ diagnosticListener.subscribe((message) => {
 });
 
 // ==========================================
+// SYSTEM LOGS LISTENER (/rosout)
+// ==========================================
+const rosoutListener = new ROSLIB.Topic({
+    ros : ros,
+    name : '/rosout',
+    messageType : 'rcl_interfaces/Log' 
+});
+
+const terminalList = document.getElementById('terminal-list');
+
+rosoutListener.subscribe((message) => {
+    // message.level dictates severity: 
+    // 10 = DEBUG, 20 = INFO, 30 = WARN, 40 = ERROR, 50 = FATAL
+    
+    // 1. Filter out annoying DEBUG spam from background nodes
+    if (message.level < 20) return; 
+
+    // 2. Determine Color and Label
+    let colorClass = 'log-info';
+    let levelText = 'INFO';
+
+    if (message.level === 30) {
+        colorClass = 'log-warn';
+        levelText = 'WARN';
+    } else if (message.level >= 40) {
+        colorClass = 'log-error';
+        levelText = 'ERROR';
+    }
+
+    const allowedNodes = ['zamboni_master_node', 'conditioner_manager'];
+
+    if (!allowedNodes.includes(message.name)) {
+        return;
+    }
+
+    // 3. Create a clean timestamp
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString('en-GB', { hour12: false });
+
+    // 4. Create the new HTML list item
+    const logItem = document.createElement('li');
+    logItem.className = colorClass;
+    
+    // Format: [14:05:22] [conditioner_manager] [INFO]: Conditioner engaged...
+    logItem.innerHTML = `
+        <span style="color: #555;">${timeStr}</span> 
+        <span style="color: #888;">${message.name}</span>: ${message.msg}
+    `;
+
+    // 5. Append to the console
+    terminalList.appendChild(logItem);
+
+    // 6. Memory Management: Prevent the browser from crashing by keeping only the last 100 logs
+    if (terminalList.childNodes.length > 100) {
+        terminalList.removeChild(terminalList.firstChild);
+    }
+
+    // 7. Auto-scroll to the bottom so the newest log is always visible
+    terminalList.scrollTop = terminalList.scrollHeight;
+});
+
+// ==========================================
 // LOOP 2: LOW-FREQUENCY (1Hz / 1000ms)
 // For real-time clocks and elapsed timers
 // ==========================================

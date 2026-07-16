@@ -502,7 +502,7 @@ class ZamboniMasterNode(Node):
     # PHASE 2: INITIATING RIGID RESURFACING
     # ============================================================
     def start_phase_2_resurfacing(self):
-        self.get_logger().info('Vaihe 2: Jäänajoaloitettu...')
+        self.get_logger().info('Vaihe 2: Jäänajo aloitettu...')
         px, py, pv = generate_zamboni_path()
 
         # self.set_conditioner_position(0.2)
