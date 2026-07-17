@@ -21,41 +21,72 @@
 
     <h1>alkuAI Autopilot™</h1>
 
-    <div class="dashboard">
+    <div class="nav-bar">
+        <button class="nav-btn active" onclick="switchView('view-main')">Etusivu</button>
+        <button class="nav-btn" onclick="switchView('view-alarms')">Hälytykset</button>
+        <button class="nav-btn" onclick="switchView('view-charts')">Kaaviot</button>
+    </div>
+
+    <div id="view-main" class="view-section">
+        <div class="dashboard">
         
-        <div class="panel">
-            <div class="chart-container">
-                <canvas id="positionChart"></canvas>
+            <div class="panel">
+                <div class="chart-container">
+                    <canvas id="positionChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="velocityChart"></canvas>
+                </div>
             </div>
-            <div class="chart-container">
-                <canvas id="velocityChart"></canvas>
+
+            <div class="panel">
+                <table class="measurement-table">
+                    <tr><td>Aktiivinen nopeusohjaus</td><td id="val-lin-vel">0.0 m/s</td></tr>
+                    <tr><td>Jääkoneen nopeus</td><td id="val-fb-vel">0.0 rad/s</td></tr>
+                    <tr><td>Vesiventtiiliin asento</td><td id="val-valve">0%</td></tr>
+                    <tr><td>Jäähöylän pyörintä</td><td id="val-auger">0.0 rad/s</td></tr>
+                    <tr><td>Vesisäiliö</td><td id="val-water">100%</td></tr>
+                    <tr><td>Jäädyttimen asento</td><td id="val-cond">Ylhällä</td></tr>
+                    <tr><td>Autopilotin tila</td><td id="val-nav">Ok</td></tr>
+                    <tr><td>Vaihe</td><td id="val-op">Valmiudessa</td></tr>
+                    <!-- <tr><td>Engine Temperature</td><td id="val-eng-temp">80 °C</td></tr>
+                    <tr><td>Ambient Temperature</td><td id="val-amb-temp">5 °C</td></tr>
+                    <tr><td>Oil Temperature</td><td id="val-oil-temp">60 °C</td></tr> -->
+                </table>
+            </div>
+
+            <div class="panel alarm-panel">
+                <div class="alarm-header">
+                    <span>Järjestelmäviestit</span>
+                </div>
+            <ul class="terminal-list" id="terminal-list">
+                </ul>
             </div>
         </div>
+    </div>
 
-        <div class="panel">
-            <table class="measurement-table">
-                <tr><td>Aktiivinen nopeusohjaus</td><td id="val-lin-vel">0.0 m/s</td></tr>
-                <tr><td>Jääkoneen nopeus</td><td id="val-fb-vel">0.0 rad/s</td></tr>
-                <tr><td>Vesiventtiiliin asento</td><td id="val-valve">0%</td></tr>
-                <tr><td>Jäähöylän pyörintä</td><td id="val-auger">0.0 rad/s</td></tr>
-                <tr><td>Vesisäiliö</td><td id="val-water">100%</td></tr>
-                <tr><td>Jäädyttimen asento</td><td id="val-cond">Ylhällä</td></tr>
-                <tr><td>Autopilotin tila</td><td id="val-nav">Ok</td></tr>
-                <tr><td>Vaihe</td><td id="val-op">Valmiudessa</td></tr>
-                <!-- <tr><td>Engine Temperature</td><td id="val-eng-temp">80 °C</td></tr>
-                <tr><td>Ambient Temperature</td><td id="val-amb-temp">5 °C</td></tr>
-                <tr><td>Oil Temperature</td><td id="val-oil-temp">60 °C</td></tr> -->
-            </table>
-        </div>
-
-        <div class="panel alarm-panel">
+    <div id="view-alarms" class="view-section" style="display: none;">
+        <!-- Move your big alarm panel here -->
+        <div class="panel" style="height: 500px;">
             <div class="alarm-header">
-                <span>Järjestelmäviestit</span>
+                <span>Aika  Hälytys</span>
+                <span>Lähde</span>
             </div>
-        <ul class="terminal-list" id="terminal-list">
+            <ul class="alarm-list" id="alarm-list">
+                <li><span>Ei hälytyksiä</span><span> </span></li>
             </ul>
         </div>
     </div>
+
+    <div id="view-charts" class="view-section" style="display: none;">
+        <!-- Move your big alarm panel here -->
+        <div class="panel" style="height: 500px;">
+            <div class="chart-container" style="height: 100%;">
+                <canvas id="multiTrendChart"></canvas>
+            </div>
+        </div>
+    </div>
+    
     <footer>
         <p>© 2026 alkuAI</p>
     </footer>

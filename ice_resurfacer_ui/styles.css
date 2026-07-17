@@ -239,3 +239,45 @@ button:active { background-color: #999; }
 .log-info { color: #a1b9ce; } /* Matches your accent blue */
 .log-warn { color: #ffeb3b; } /* Yellow */
 .log-error { color: #ff1744; font-weight: bold; } /* Red */
+
+/* Navigation Bar Styles */
+.nav-bar {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.nav-btn {
+    background-color: transparent;
+    color: var(--text-main);
+    border: 2px solid #333;
+    padding: 10px 25px;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+.nav-btn:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-color: #555;
+}
+
+/* Highlights the currently active tab */
+.nav-btn.active {
+    background-color: rgba(161, 185, 206, 0.15); /* Faint accent blue */
+    border-color: var(--accent-blue);
+    color: var(--accent-blue);
+}
+
+/* Ensure our view sections fill the screen nicely */
+.view-section {
+    width: 100%;
+    animation: fadeIn 0.3s; /* Smooth transition effect */
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}

@@ -1,3 +1,26 @@
+// ==========================================
+// UI VIEW SWITCHER
+// ==========================================
+function switchView(targetViewId) {
+    // 1. Hide all view sections
+    const views = document.querySelectorAll('.view-section');
+    views.forEach(view => {
+        view.style.display = 'none';
+    });
+
+    // 2. Show the requested view
+    document.getElementById(targetViewId).style.display = 'block';
+
+    // 3. Update button styling
+    const buttons = document.querySelectorAll('.nav-btn');
+    buttons.forEach(btn => {
+        btn.classList.remove('active');
+    });
+
+    // Find the button that was clicked and make it active
+    event.currentTarget.classList.add('active');
+}
+
 // A. Position Chart (Scatter Plot simulating the Rink)
 const ctxPos = document.getElementById('positionChart').getContext('2d');
 const positionChart = new Chart(ctxPos, {
@@ -72,6 +95,10 @@ let isRunning = false;
 let timeTick = 0;
 let waterLevel = 100;
 let pathData = [];
+
+// Global variables for Trend Sampling
+let latestCmdVel = 0.0;
+let latestOdomVel = 0.0;
 
 // function startSequence() {
 //     isRunning = true;
@@ -164,6 +191,7 @@ velocityListener.subscribe((message) => {
     // 1. Update text UI
     let currentVel = message.linear.x;
     document.getElementById('val-lin-vel').innerText = currentVel.toFixed(2) + " m/s";
+    latestCmdVel = 3.6 * currentVel;
 });
 
 const odomListener = new ROSLIB.Topic({
@@ -190,7 +218,73 @@ odomListener.subscribe((message) => {
     velData.push(realVel);
     velData.shift(); 
     velocityChart.update()
+    latestOdomVel = realVel;
 });
+
+// ==========================================
+// MULTI-TREND VIEWER (Page 3)
+// ==========================================
+const ctxTrend = document.getElementById('multiTrendChart').getContext('2d');
+const multiTrendChart = new Chart(ctxTrend, {
+    type: 'line',
+    data: {
+        labels: Array(100).fill(''), // 100 data points on the X-axis
+        datasets: [
+            {
+                label: 'Nopeusohje (km/h)', // Dataset 0
+                data: Array(100).fill(0),
+                borderColor: '#3399FF', // alkuAI Blue
+                borderWidth: 2,
+                tension: 0.2,
+                pointRadius: 0
+            },
+            {
+                label: 'Todellinen nopeus (km/h)', // Dataset 1
+                data: Array(100).fill(0),
+                borderColor: '#00E676', // Neon Green
+                borderWidth: 2,
+                tension: 0.2,
+                pointRadius: 0
+            }
+        ]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: {  min: -5, max: 10,
+                title: {display: true, text: 'Nopeus (km/h)', color: '#aaaaaa'},
+                grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                ticks: { color: '#888888' }
+            },
+            x: { display: false }
+        },
+        plugins: { 
+            legend: { 
+                display: true, 
+                labels: { color: '#e0e0e0' } 
+            } 
+        },
+        animation: false
+    }
+});
+
+setInterval(() => {
+    // 1. Grab the arrays for both lines
+    let cmdData = multiTrendChart.data.datasets[0].data;
+    let odomData = multiTrendChart.data.datasets[1].data;
+
+    // 2. Push the latest values simultaneously
+    cmdData.push(latestCmdVel);
+    odomData.push(latestOdomVel);
+
+    // 3. Shift the oldest data off the front to maintain the 100-point window
+    cmdData.shift();
+    odomData.shift();
+
+    // 4. Update the chart once
+    multiTrendChart.update();
+}, 200);
 
 
 // Conditioner state
@@ -268,11 +362,10 @@ diagnosticListener.subscribe((message) => {
         // We only care if something is wrong (Level > 0)
         if (status.level > 0) {
             
-
-            if (status.message.includes("High execution jitter") || 
-                status.message.includes("No events recorded")) {
-                return; // Skips the rest of the loop for this specific message
-            }
+            // if (status.message.includes("High execution jitter") || 
+            //     status.message.includes("No events recorded")) {
+            //     return; // Skips the rest of the loop for this specific message
+            // }
             // Anti-Spam Filter: Diagnostics publish constantly. 
             // We only want to push to the UI if it's a NEW alarm, 
             // or we will crash the browser with thousands of list items.
