@@ -21,9 +21,12 @@ class ConditionerManager(Node):
         self.MAX_WATER_VALVE_OPENING = 1.00 # 0-100 % Open
         self.MAX_AUGER_SPEED = 15.0         # rad/s
         self.MAX_TANK_CAPACITY = 727.0
+        self.MAX_FUEL_CAPACITY = 100.0
+        self.current_fuel_capacity = self.MAX_FUEL_CAPACITY      
         self.current_water_capacity = self.MAX_TANK_CAPACITY
-        self.WATER_FLOW_RATE = 0.1
+        self.WATER_FLOW_RATE = 0.2
         self.current_valve_opening = 0.0
+        self.current_velocity = 0.0
 
         # --------------------------------
         # Control Loop
@@ -71,6 +74,12 @@ class ConditionerManager(Node):
             10
         )
 
+        self.fuel_level_pub = self.create_publisher(
+            Float64,
+            '/fuel_tank_level',
+            10
+        )
+
         # ---------------------------------------------------------
         # ACTION CLIENT (Migrated from autonomy_seq.py)
         # ---------------------------------------------------------
@@ -109,6 +118,7 @@ class ConditionerManager(Node):
             # Map to the 90-degree valve opening
             valve_position = speed_ratio * self.MAX_WATER_VALVE_OPENING
             self.current_valve_opening = speed_ratio
+            self.current_velocity = current_speed
             
             self.set_water_valve(valve_position)
             self.set_auger_speed(self.MAX_AUGER_SPEED)
@@ -152,17 +162,33 @@ class ConditionerManager(Node):
         
         # 1. Calculate how much water we sprayed in the last 0.1 seconds
         water_consumed = self.current_valve_opening * self.WATER_FLOW_RATE * self.dt
+        fuel_consumed = self.current_velocity * 0.01 * self.dt
         
         # 2. Drain the tank (using max() so it never goes below 0)
         self.current_water_capacity = max(self.current_water_capacity - water_consumed, 0.0)
+        self.current_fuel_capacity = max(self.current_fuel_capacity - fuel_consumed, 0.0)
         
         # 3. Calculate the percentage for the UI (0.0 to 100.0)
         tank_percentage = (self.current_water_capacity / self.MAX_TANK_CAPACITY) * 100.0
+        fuel_percentage = (self.current_fuel_capacity / self.MAX_FUEL_CAPACITY) * 100.0
         
+        # Level alarms
+        if tank_percentage < 50.0:
+            self.get_logger().info("Vesisäiliön taso 50%")
+            return
+        
+        if fuel_percentage < 15.0:
+            self.get_logger().info("Polttoaine lopussa. Tankkaa ajoneuvo.")
+            return
+
         # 4. Publish it to the ROS 2 network
         msg = Float64()
         msg.data = tank_percentage
         self.tank_level_pub.publish(msg)
+
+        fuel_msg = Float64()
+        fuel_msg.data = fuel_percentage
+        self.fuel_level_pub.publish(fuel_msg)
 
 def main(args=None):
     rclpy.init(args=args)

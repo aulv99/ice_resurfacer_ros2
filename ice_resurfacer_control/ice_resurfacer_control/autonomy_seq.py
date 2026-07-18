@@ -12,6 +12,7 @@ from rclpy.qos import QoSProfile, QoSDurabilityPolicy, QoSReliabilityPolicy, qos
 from control_msgs.action import FollowJointTrajectory
 from trajectory_msgs.msg import JointTrajectoryPoint
 from std_msgs.msg import String
+from std_srvs.srv import Trigger
 
 # ============================================================
 # RINK & ZAMBONI PARAMETERS
@@ -301,6 +302,13 @@ class ZamboniMasterNode(Node):
         self._nav_to_pose_client = ActionClient(self, NavigateToPose, 'navigate_to_pose')
         # self._conditioner_client = ActionClient(self, FollowJointTrajectory, '/conditioner_controller/follow_joint_trajectory')
         self.state_pub = self.create_publisher(String, '/mission_state', 10)
+
+        # ROS2 Service Server
+        self.start_srv = self.create_service(Trigger, '/start_sequence', self.start_callback)
+        self.stop_srv = self.create_service(Trigger, '/stop_sequence', self.stop_callback)
+        
+        # We need a variable to track if we are allowed to run
+        self.is_running = False
         
         # --- State Tracking ---
         self.mission_state = 'IDLE'  
@@ -316,6 +324,42 @@ class ZamboniMasterNode(Node):
             qos_profile_sensor_data
         )
 
+    # 3. Create the Callbacks
+    def start_callback(self, request, response):
+        """ Triggered when the UI presses START """
+        if self.is_running:
+            response.success = False
+            response.message = "Jäänajo on jo käynnissä"
+            return response
+            
+        # Add safety checks here
+        
+        self.is_running = True
+        self.get_logger().info("Jäänajo aloitettu ohjauspaneelista")
+        
+        # Triggering the 
+        self.start_phase_1_transit()
+        
+        response.success = True
+        response.message = "Sequence started successfully."
+        return response
+
+    def stop_callback(self, request, response):
+        """ Triggered when the UI presses STOP """
+        if not self.is_running:
+            response.success = False
+            response.message = "Already stopped."
+            return response
+
+        self.is_running = False
+        self.get_logger().warn("Jäänajo keskeytetty")
+        
+        # -> INSERT YOUR CODE HERE to cancel the Nav2 goal and publish 0.0 to cmd_vel
+        
+        response.success = True
+        response.message = "Emergency Stop executed."
+        return response
+
     def set_and_publish_state(self, new_state):
         """ Updates internal state and broadcasts it to the ROS network """
         self.mission_state = new_state
@@ -323,27 +367,6 @@ class ZamboniMasterNode(Node):
         msg.data = new_state
         self.state_pub.publish(msg)
         self.get_logger().info(f"Tila vaihtunut: {new_state} ")  
-
-    # ------------- Ice Conditioner Actuation logic -------------
-    # def set_conditioner_position(self, target_position, duration_sec=3):
-    #     self.get_logger().info(f'Actuating conditioner to position: {target_position}')
-        
-    #     if not self._conditioner_client.wait_for_server(timeout_sec=2.0):
-    #         self.get_logger().error('Conditioner Action Server not available!')
-    #         return
-
-    #     goal_msg = FollowJointTrajectory.Goal()
-    #     goal_msg.trajectory.joint_names = ['conditioner_joint']
-        
-    #     point = JointTrajectoryPoint()
-    #     point.positions = [float(target_position)]
-    #     point.time_from_start.sec = int(duration_sec)
-    #     point.time_from_start.nanosec = 0
-        
-    #     goal_msg.trajectory.points = [point]
-        
-    #     # We send it asynchronously so the Zamboni can keep driving while it lowers/raises!
-    #     self._conditioner_client.send_goal_async(goal_msg)
 
     # ============================================================
     # SHARED ODOMETRY CALLBACK (Traffic Controller)
@@ -621,6 +644,7 @@ class ZamboniMasterNode(Node):
         result = future.result()
         if result.status == GoalStatus.STATUS_SUCCEEDED:
             self.set_and_publish_state('IDLE')
+            self.is_running = False
             self.get_logger().info('Valmista tuli. Jää on ajettu ja jääkone tallissa')
 
 def main(args=None):
@@ -628,7 +652,7 @@ def main(args=None):
     client = ZamboniMasterNode()
     
     # Kick off Phase 1 immediately
-    client.start_phase_1_transit()
+    # client.start_phase_1_transit()
     
     rclpy.spin(client)
     client.destroy_node()

@@ -100,30 +100,6 @@ let pathData = [];
 let latestCmdVel = 0.0;
 let latestOdomVel = 0.0;
 
-// function startSequence() {
-//     isRunning = true;
-//     document.getElementById('val-op').innerText = "Resurfacing";
-//     document.getElementById('val-cond').innerText = "Down";
-//     document.getElementById('val-nav').innerText = "Active";
-//     document.getElementById('val-valve').innerText = "90%";
-//     document.getElementById('val-auger').innerText = "15.0 rad/s";
-    
-//     // Clear old alarms
-//     document.getElementById('alarm-list').innerHTML = "";
-//     pathData = []; // Clear old path
-// }
-
-// function stopSequence() {
-//     if (!isRunning) return; // Don't do anything if it's already stopped
-    
-//     isRunning = false;
-//     document.getElementById('val-op').innerText = "Manual Override";
-//     document.getElementById('val-cond').innerText = "Up";
-//     document.getElementById('val-nav').innerText = "Aborted";
-    
-//     // Trigger our new dynamic alarm!
-//     triggerAlarm("E-STOP: Operator halted sequence", "HMI Panel");
-// }
 
 // ==========================================
 // ROS 2 CONNECTION MANAGER
@@ -149,6 +125,48 @@ ros.on('close', () => {
     document.getElementById('val-nav').innerText = "Ei yhteyttä";
     document.getElementById('val-nav').style.color = "#888";
 });
+
+// ------------------------------------------
+// ROS 2 Services (Start sequence)
+// ------------------------------------------
+
+const startService = new ROSLIB.Service({
+    ros: ros,
+    name: '/start_sequence',
+    serviceType: 'std_srvs/srv/Trigger' 
+});
+
+const stopService = new ROSLIB.Service({
+    ros: ros,
+    name: '/stop_sequence',
+    serviceType: 'std_srvs/srv/Trigger'
+});
+
+function callOperationService(command) {
+    const request = new ROSLIB.ServiceRequest({}); // Trigger services don't need data sent
+
+    if (command === 'START') {
+        startService.callService(request, (result) => {
+            console.log("Start Response:", result);
+            if (result.success) {
+                // Optional: Make the UI visually confirm it started
+                document.getElementById('val-op').style.color = "#00E676"; 
+            } else {
+                // If the robot refused to start, pop up a browser alert!
+                alert("START FAILED: " + result.message);
+            }
+        });
+    }
+    else if (command === 'STOP') {
+        stopService.callService(request, (result) => {
+            console.log("Stop Response:", result);
+            if (result.success) {
+                document.getElementById('val-op').style.color = "#ff1744"; 
+                alert("ZAMBONI HALTED!");
+            }
+        });
+    }
+}
 
 const stateListener = new ROSLIB.Topic({
     ros : ros,
@@ -345,6 +363,18 @@ tankListener.subscribe((message) => {
     document.getElementById('val-water').innerText = message.data.toFixed(0) + " %";  
 });
 
+// Water Tank Level
+const fuelListener = new ROSLIB.Topic({
+    ros : ros,
+    name: '/fuel_tank_level',
+    messageType: 'std_msgs/Float64'
+});
+
+fuelListener.subscribe((message) => {
+    // Formatting to 0 decimals so it reads smoothly like "98%"
+    document.getElementById('val-fuel').innerText = message.data.toFixed(0) + " %";  
+});
+
  // ==========================================
 // DIAGNOSTICS & ALARMS LISTENER
 // ==========================================
@@ -389,7 +419,7 @@ const rosoutListener = new ROSLIB.Topic({
     messageType : 'rcl_interfaces/Log' 
 });
 
-const terminalList = document.getElementById('terminal-list');
+const systemList = document.getElementById('system-list');
 
 rosoutListener.subscribe((message) => {
     // message.level dictates severity: 
@@ -427,19 +457,19 @@ rosoutListener.subscribe((message) => {
     // Format: [14:05:22] [conditioner_manager] [INFO]: Conditioner engaged...
     logItem.innerHTML = `
         <span style="color: #555;">${timeStr}</span> 
-        <span style="color: #888;">${message.name}</span>: ${message.msg}
+        <span style="color: #888;">${message.name}</span> ${message.msg}
     `;
 
     // 5. Append to the console
-    terminalList.appendChild(logItem);
+    systemList.appendChild(logItem);
 
     // 6. Memory Management: Prevent the browser from crashing by keeping only the last 100 logs
-    if (terminalList.childNodes.length > 100) {
-        terminalList.removeChild(terminalList.firstChild);
+    if (systemList.childNodes.length > 100) {
+        systemList.removeChild(systemList.firstChild);
     }
 
     // 7. Auto-scroll to the bottom so the newest log is always visible
-    terminalList.scrollTop = terminalList.scrollHeight;
+    systemList.scrollTop = systemList.scrollHeight;
 });
 
 // ==========================================

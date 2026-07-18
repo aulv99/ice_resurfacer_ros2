@@ -76,7 +76,7 @@
             <specular>0.5 0.5 0.5 1.0</specular>
             <pbr>
               <metal>
-                <albedo_map>model://ice_resurfacer_gazebo/materials/textures/Hockeyrink_IIHF.png</albedo_map>
+                <albedo_map>model://ice_resurfacer_gazebo/materials/textures/Hockeyrink_IIHF_ads.png</albedo_map>
                 <roughness>0.1</roughness> 
                 <metalness>0.0</metalness>
               </metal>

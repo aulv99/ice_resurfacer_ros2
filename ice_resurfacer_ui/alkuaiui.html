@@ -15,7 +15,7 @@
     <script src="https://cdn.jsdelivr.net/npm/roslib@1/build/roslib.min.js"></script>
 </head>
 <body>
-    <img src="alkuAIlogocrop.png" id="brand-logo" alt="Zamboni Logo">
+    <img src="alkuAI black cropped.png" id="brand-logo" alt="Zamboni Logo">
 
     <div id="system-clock">--/--/---- --:--:--</div>
 
@@ -25,6 +25,7 @@
         <button class="nav-btn active" onclick="switchView('view-main')">Etusivu</button>
         <button class="nav-btn" onclick="switchView('view-alarms')">Hälytykset</button>
         <button class="nav-btn" onclick="switchView('view-charts')">Kaaviot</button>
+        <button class="nav-btn" onclick="switchView('view-sequence')">Sekvenssi</button>
     </div>
 
     <div id="view-main" class="view-section">
@@ -44,8 +45,9 @@
                     <tr><td>Aktiivinen nopeusohjaus</td><td id="val-lin-vel">0.0 m/s</td></tr>
                     <tr><td>Jääkoneen nopeus</td><td id="val-fb-vel">0.0 rad/s</td></tr>
                     <tr><td>Vesiventtiiliin asento</td><td id="val-valve">0%</td></tr>
-                    <tr><td>Jäähöylän pyörintä</td><td id="val-auger">0.0 rad/s</td></tr>
+                    <tr><td>Lumikairan pyörintä</td><td id="val-auger">0.0 rad/s</td></tr>
                     <tr><td>Vesisäiliö</td><td id="val-water">100%</td></tr>
+                    <tr><td>Polttoainesäiliö</td><td id="val-fuel">100%</td></tr>
                     <tr><td>Jäädyttimen asento</td><td id="val-cond">Ylhällä</td></tr>
                     <tr><td>Autopilotin tila</td><td id="val-nav">Ok</td></tr>
                     <tr><td>Vaihe</td><td id="val-op">Valmiudessa</td></tr>
@@ -55,11 +57,11 @@
                 </table>
             </div>
 
-            <div class="panel alarm-panel">
-                <div class="alarm-header">
+            <div class="panel system-panel">
+                <div class="system-header">
                     <span>Järjestelmäviestit</span>
                 </div>
-            <ul class="terminal-list" id="terminal-list">
+            <ul class="system-list" id="system-list">
                 </ul>
             </div>
         </div>
@@ -69,7 +71,7 @@
         <!-- Move your big alarm panel here -->
         <div class="panel" style="height: 500px;">
             <div class="alarm-header">
-                <span>Aika  Hälytys</span>
+                <span>Aika              Hälytys</span>
                 <span>Lähde</span>
             </div>
             <ul class="alarm-list" id="alarm-list">
@@ -83,6 +85,16 @@
         <div class="panel" style="height: 500px;">
             <div class="chart-container" style="height: 100%;">
                 <canvas id="multiTrendChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div id="view-sequence" class="view-section" style="display: none;">
+        <div class="panel operations-panel">
+            <!-- <div style="text-align: center; font-size: 1.1rem; margin-bottom: 20px;">Operation Mode: Auto</div> -->
+            <div class="button-group">
+                <button class="nav-btn" onclick="callOperationService('START')" >Aloita jäänajo</button>
+                <button class="nav-btn" onclick="callOperationService('STOP')" style="background-color: #ff1744; color: #fff;">Pysäytä jäänajo</button>
             </div>
         </div>
     </div>

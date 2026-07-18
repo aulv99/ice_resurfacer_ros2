@@ -1,7 +1,7 @@
 :root {
     --bg-dark: #111111;
     --panel-bg: #1c1c1e; 
-    --text-main: #e0e0e0; /* Changed from black to light gray */
+    --text-main: #d9d9d9; /* Changed from black to light gray */
     --accent-blue: #a1b9ce;
     --accent-red: #ca0028;
     --font-main: 'Ubuntu', sans-serif;
@@ -203,15 +203,17 @@ button:active { background-color: #999; }
 /* ========================================== */
 /* TERMINAL CONSOLE STYLES */
 /* ========================================== */
-.terminal-panel {
-    margin: 20px auto;
-    max-width: 1600px;
-    height: 220px; /* Fixed height so it doesn't take over the screen */
-    background-color: #0a0a0c; /* Very dark, almost true black */
-    font-family: 'Courier New', Courier, monospace; /* Classic terminal font */
+.system-panel {
+    margin: 0; /* let the grid control spacing */
+    height: auto; /* don't force a fixed height */
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex: 1 1 auto; /* allow it to grow/shrink with other panels */
+    min-height: 0; /* allow internal scroll areas to work correctly */
 }
 
-.terminal-header {
+.system-header {
     color: #727272;
     border-bottom: 1px solid #333;
     padding-bottom: 5px;
@@ -220,7 +222,7 @@ button:active { background-color: #999; }
     font-weight: bold;
 }
 
-.terminal-list {
+.system-list {
     list-style: none;
     padding: 0;
     margin: 0;
@@ -236,7 +238,7 @@ button:active { background-color: #999; }
 }
 
 /* Color coding based on ROS 2 Log Severity */
-.log-info { color: #a1b9ce; } /* Matches your accent blue */
+.log-info { color: #d9d9d9; } /* Matches your accent blue */
 .log-warn { color: #ffeb3b; } /* Yellow */
 .log-error { color: #ff1744; font-weight: bold; } /* Red */
 
