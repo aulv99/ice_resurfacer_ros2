@@ -77,6 +77,7 @@ def generate_launch_description():
     sensor_bridge = Node(
         package='ros_gz_bridge',
         executable='parameter_bridge',
+        name='sensor_parameter_bridge',
         arguments=[
             '/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock', 
             '/scan@sensor_msgs/msg/LaserScan[gz.msgs.LaserScan', 
@@ -89,6 +90,7 @@ def generate_launch_description():
     gz_odom_bridge = Node(
         package='ros_gz_bridge',
         executable='parameter_bridge',
+        name='odom_parameter_bridge',
         arguments=['/model/ice_resurfacer/odometry@nav_msgs/msg/Odometry[gz.msgs.Odometry'],
         remappings=[('/model/ice_resurfacer/odometry', '/ground_truth_pose')],
         output='screen'

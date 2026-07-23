@@ -23,4 +23,6 @@ __pycache__/
 .DS_Store
 .AppleDouble
 .LSOverride
-Thumbs.db
+Thumbs.dbbuild/
+install/
+log/

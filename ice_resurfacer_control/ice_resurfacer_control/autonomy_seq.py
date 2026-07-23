@@ -652,7 +652,11 @@ def main(args=None):
     client = ZamboniMasterNode()
     
     # Kick off Phase 1 immediately
-    # client.start_phase_1_transit()
+    def run_once():
+        client.init_timer.cancel()
+        client.start_phase_1_transit()
+
+    client.init_timer = client.create_timer(15.0, run_once)
     
     rclpy.spin(client)
     client.destroy_node()

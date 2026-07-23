@@ -57,10 +57,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/aaro/ice_resurfacer_ws/src/ice_resurfacer_nav
+CMAKE_SOURCE_DIR = home/aaro-ulvila/ros2_ws/src/ice_resurfacer_nav
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/aaro/ice_resurfacer_ws/src/ice_resurfacer_nav/build/ice_resurfacer_nav
+CMAKE_BINARY_DIR = home/aaro-ulvila/ros2_ws/src/ice_resurfacer_nav/build/ice_resurfacer_nav
 
 #=============================================================================
 # Targets provided globally by CMake.

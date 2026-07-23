@@ -1,1 +1,0 @@
-/home/aaro/ice_resurfacer_ws/src/ice_resurfacer_nav/launch/zamboni_nav.launch.py

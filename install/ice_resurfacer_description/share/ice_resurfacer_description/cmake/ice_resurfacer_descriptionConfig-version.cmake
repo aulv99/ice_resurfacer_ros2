@@ -1,1 +1,0 @@
-/home/aaro/ice_resurfacer_ws/src/build/ice_resurfacer_description/ament_cmake_core/ice_resurfacer_descriptionConfig-version.cmake
