@@ -9,34 +9,21 @@ def generate_launch_description():
     pkg_share = get_package_share_directory('ice_resurfacer_description')
     
     # Check if we are using the xacro file
-    xacro_file = os.path.join(pkg_share, 'urdf', 'ice_resurfacer.urdf.xacro')
+    xacro_file = os.path.join(pkg_share, 'urdf', 'ice_resurfacer3.urdf.xacro')
 
-    # Robot State Publisher 
-    robot_state_publisher = Node(
-        package='robot_state_publisher',
-        executable='robot_state_publisher',
-        name='robot_state_publisher',
-        output='screen',
-        parameters=[{'robot_description': Command(['xacro ', xacro_file])}]
-    )
-
-    # Joint State Publisher GUI 
-    joint_state_publisher_gui = Node(
-        package='joint_state_publisher_gui',
-        executable='joint_state_publisher_gui',
-        name='joint_state_publisher_gui'
-    )
+    # RViz config
+    config_file = os.path.join(pkg_share, 'rviz', 'rviz_config1.rviz')
 
     # RViz2 
     rviz = Node(
         package='rviz2',
         executable='rviz2',
         name='rviz2',
-        output='screen'
+        output='screen',
+        parameters=[{'use_sim_time': True}],
+        arguments=['-d', config_file]
     )
 
     return LaunchDescription([
-        robot_state_publisher,
-        joint_state_publisher_gui,
         rviz
     ])

@@ -27,4 +27,8 @@ install(DIRECTORY meshes
   OPTIONAL # Don't fail if folder is empty
 )
 
+install(DIRECTORY rviz
+  DESTINATION share/${PROJECT_NAME}
+)
+
 ament_package()

@@ -34,6 +34,14 @@
     </inertial>
   </xacro:macro>
 
+  <link name="base_footprint"/>
+  <joint name="base_footprint_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="base_link"/>
+    <!-- Pushes the entire robot body UP 1.5 meters from the floor -->
+    <origin xyz="0 0 1.25" rpy="0 0 0"/> 
+  </joint> 
+
   <link name="base_link">
     <visual>
       <origin xyz="-0.2 0.95 0.575" rpy="3.14159 0 0"/>

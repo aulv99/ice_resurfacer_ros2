@@ -604,7 +604,7 @@ class ZamboniMasterNode(Node):
         if result.status == GoalStatus.STATUS_SUCCEEDED:
             self.get_logger().info('Tyhjennetään lumisäilötä')
             self.cmd_vel_pub.publish(Twist())
-            self.delay_timer = self.create_timer(3.0, self._trigger_manual_reverse)
+            self.delay_timer = self.create_timer(5.0, self._trigger_manual_reverse)
 
     def _trigger_manual_reverse(self):
         self.delay_timer.cancel()
@@ -652,11 +652,11 @@ def main(args=None):
     client = ZamboniMasterNode()
     
     # Kick off Phase 1 immediately
-    def run_once():
-        client.init_timer.cancel()
-        client.start_phase_1_transit()
+    #def run_once():
+    #    client.init_timer.cancel()
+    #    client.start_phase_1_transit()
 
-    client.init_timer = client.create_timer(15.0, run_once)
+    #client.init_timer = client.create_timer(5.0, run_once)
     
     rclpy.spin(client)
     client.destroy_node()

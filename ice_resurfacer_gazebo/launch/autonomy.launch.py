@@ -114,7 +114,10 @@ def generate_launch_description():
         package='nav2_map_server',
         executable='map_server',
         name='map_server',
-        parameters=[{'yaml_filename': os.path.join(pkg_ice_nav, 'maps', 'PerfectRefinedMap3.yaml')}]
+        parameters=[
+            {'yaml_filename': os.path.join(pkg_ice_nav, 'maps', 'PerfectRefinedMap3.yaml')},
+            {'use_sim_time': True}  # <-- Add this line
+        ]
     )
     
     lifecycle_manager_map = Node(
