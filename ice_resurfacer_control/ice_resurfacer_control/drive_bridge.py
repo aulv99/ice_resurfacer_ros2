@@ -23,7 +23,7 @@ class DriveBridge(Node):
     def listener_callback(self, msg):
         stamped = TwistStamped()
         stamped.header.stamp = self.get_clock().now().to_msg()
-        stamped.header.frame_id = 'base_link' 
+        stamped.header.frame_id = 'base_link'
         stamped.twist = msg
         self.publisher.publish(stamped)
 

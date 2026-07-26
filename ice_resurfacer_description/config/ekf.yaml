@@ -9,7 +9,7 @@ ekf_filter_node:
     # Frames
     map_frame: map
     odom_frame: odom
-    base_link_frame: base_footprint
+    base_link_frame: base_link
     world_frame: odom
 
     # Sensor 1: Wheel Odometry from the Ackermann Controller
