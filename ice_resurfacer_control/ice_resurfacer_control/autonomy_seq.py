@@ -578,7 +578,7 @@ class ZamboniMasterNode(Node):
         self.get_logger().info('Vaihe 3B: Ajetaan lumentyhjäyspaikalle')
 
         target_x = -41.50
-        target_y = -19.0 # Changed from -20.0 to -19.0 so it doesn't drive too far.
+        target_y = -19.5 # Changed from -20.0 to -19.0 so it doesn't drive too far.
         target_yaw = -math.pi / 2
 
         goal_msg = NavigateToPose.Goal()

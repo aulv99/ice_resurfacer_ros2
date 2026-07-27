@@ -32,7 +32,7 @@ def generate_launch_description():
         package='nav2_map_server',
         executable='map_server',
         name='map_server',
-        parameters=[{'yaml_filename': os.path.join(my_nav_dir, 'maps', 'iihf_rink4.yaml')}]
+        parameters=[{'yaml_filename': os.path.join(my_nav_dir, 'maps', 'PerfectRefinedMap3.yaml')}]
     )
 
     # Lifecycle manager. Turns the map server
