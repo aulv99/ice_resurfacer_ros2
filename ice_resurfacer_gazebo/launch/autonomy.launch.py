@@ -92,8 +92,17 @@ def generate_launch_description():
         executable='parameter_bridge',
         name='odom_parameter_bridge',
         arguments=['/model/ice_resurfacer/odometry@nav_msgs/msg/Odometry[gz.msgs.Odometry'],
-        remappings=[('/model/ice_resurfacer/odometry', '/ground_truth_pose')],
+        # remappings=[('/model/ice_resurfacer/odometry', '/ground_truth_pose')],
         output='screen'
+    )
+
+    # FAKE LOCALIZATION (map -> odom)
+    static_transform_publisher = Node(
+        package='tf2_ros',
+        executable='static_transform_publisher',
+        name='static_transform_publisher',
+        arguments=['-34.5', '-10.25', '0.1', '0', '0', '0', 'map', 'odom'],
+        parameters=[{'use_sim_time': True}]
     )
 
     # tf_base_footprint = Node(
@@ -194,4 +203,5 @@ def generate_launch_description():
         start_ekf_node,
         start_nav2_cmd,
         # tf_base_footprint
+        static_transform_publisher
     ])
