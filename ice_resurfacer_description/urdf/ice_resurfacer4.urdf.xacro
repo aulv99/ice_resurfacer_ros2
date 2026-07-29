@@ -364,7 +364,7 @@
 
   <gazebo reference="rear_left_wheel">
     <material>Gazebo/DarkGrey</material>
-    <mu1>2.0</mu1> <mu2>2.0</mu2>
+    <mu1>0.7</mu1> <mu2>0.7</mu2>
     <fdir1>1 0 0</fdir1>
     <kp>100000.0</kp> <kd>500.0</kd>        
     <minDepth>0.01</minDepth> <maxVel>0.1</maxVel>       
@@ -372,7 +372,7 @@
 
   <gazebo reference="rear_right_wheel">
     <material>Gazebo/DarkGrey</material>
-    <mu1>2.0</mu1> <mu2>2.0</mu2>
+    <mu1>0.7</mu1> <mu2>0.7</mu2>
     <fdir1>1 0 0</fdir1>
     <kp>100000.0</kp> <kd>500.0</kd>   
     <minDepth>0.01</minDepth> <maxVel>0.1</maxVel>       
@@ -380,7 +380,7 @@
 
   <gazebo reference="front_left_wheel">
     <material>Gazebo/DarkGrey</material>
-    <mu1>2.0</mu1> <mu2>2.0</mu2>
+    <mu1>0.7</mu1> <mu2>0.7</mu2>
     <fdir1>1 0 0</fdir1> 
     <kp>100000.0</kp> <kd>500.0</kd>
     <minDepth>0.01</minDepth> <maxVel>0.1</maxVel>      
@@ -388,7 +388,7 @@
 
   <gazebo reference="front_right_wheel">
     <material>Gazebo/DarkGrey</material>
-    <mu1>2.0</mu1> <mu2>2.0</mu2>
+    <mu1>0.7</mu1> <mu2>0.7</mu2> 
     <fdir1>1 0 0</fdir1>
     <kp>100000.0</kp> <kd>500.0</kd>
     <minDepth>0.01</minDepth> <maxVel>0.1</maxVel>     
@@ -442,9 +442,8 @@
   </gazebo>
   
   <gazebo>
-    <!-- Plugin remains locked strictly to base_link -->
     <plugin filename="gz-sim-odometry-publisher-system" name="gz::sim::systems::OdometryPublisher">
-      <odom_frame>odom</odom_frame>
+      <odom_frame>map</odom_frame>
       <robot_base_frame>base_link</robot_base_frame>
       <odom_publish_frequency>50</odom_publish_frequency>
     </plugin>
