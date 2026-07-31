@@ -7,7 +7,7 @@
   <xacro:property name="chassis_mass" value="3143.0"/>  
   <xacro:property name="wheel_radius" value="0.386"/> 
   <xacro:property name="wheel_width" value="0.215"/>
-  <xacro:property name="wheel_mass" value="50.0"/>
+  <xacro:property name="wheel_mass" value="20.0"/>
   
   <xacro:property name="wheel_base_x" value="0.98"/> 
   <xacro:property name="wheel_sep_y" value="0.685"/>  
@@ -18,7 +18,6 @@
 
   <xacro:property name="ground_clearance" value="0.25"/>
 
-  <!-- UPGRADED MACRO: Now accepts x, y, z to shift the center of mass independently -->
   <xacro:macro name="box_inertia" params="m w h d x y z">
     <inertial>
       <origin xyz="${x} ${y} ${z}" rpy="0 0 0"/>
