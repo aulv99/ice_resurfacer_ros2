@@ -203,7 +203,7 @@ Visualization Manager:
       Position Transformer: XYZ
       Selectable: true
       Size (Pixels): 3
-      Size (m): 0.009999999776482582
+      Size (m): 0.05000000074505806
       Style: Flat Squares
       Topic:
         Depth: 5
@@ -233,7 +233,7 @@ Visualization Manager:
           Value: true
         Value: true
       Enabled: true
-      Keep: 100
+      Keep: 1
       Name: Odometry
       Position Tolerance: 0.10000000149011612
       Shape:
@@ -245,7 +245,7 @@ Visualization Manager:
         Head Radius: 0.10000000149011612
         Shaft Length: 1
         Shaft Radius: 0.05000000074505806
-        Value: Axes
+        Value: Arrow
       Topic:
         Depth: 5
         Durability Policy: Volatile
@@ -306,78 +306,21 @@ Visualization Manager:
         Value: /plan
       Value: true
     - Class: rviz_default_plugins/TF
-      Enabled: true
+      Enabled: false
       Filter (blacklist): ""
       Filter (whitelist): ""
       Frame Timeout: 15
       Frames:
         All Enabled: true
-        base_link:
-          Value: true
-        conditioner_link:
-          Value: true
-        front_left_steering_link:
-          Value: true
-        front_left_wheel:
-          Value: true
-        front_right_steering_link:
-          Value: true
-        front_right_wheel:
-          Value: true
-        horizontal_auger_link:
-          Value: true
-        imu_link:
-          Value: true
-        laser_link:
-          Value: true
-        map:
-          Value: true
-        odom:
-          Value: true
-        rear_left_wheel:
-          Value: true
-        rear_right_wheel:
-          Value: true
-        vertical_auger_link:
-          Value: true
-        water_tank_link:
-          Value: true
-        water_valve_link:
-          Value: true
       Marker Scale: 1
       Name: TF
       Show Arrows: true
       Show Axes: true
       Show Names: false
       Tree:
-        map:
-          odom:
-            base_link:
-              conditioner_link:
-                horizontal_auger_link:
-                  {}
-                vertical_auger_link:
-                  {}
-                water_valve_link:
-                  {}
-              front_left_steering_link:
-                front_left_wheel:
-                  {}
-              front_right_steering_link:
-                front_right_wheel:
-                  {}
-              imu_link:
-                {}
-              laser_link:
-                {}
-              rear_left_wheel:
-                {}
-              rear_right_wheel:
-                {}
-              water_tank_link:
-                {}
+        {}
       Update Interval: 0
-      Value: true
+      Value: false
     - Angle Tolerance: 0.10000000149011612
       Class: rviz_default_plugins/Odometry
       Covariance:
@@ -394,16 +337,16 @@ Visualization Manager:
           Color: 204; 51; 204
           Scale: 1
           Value: true
-        Value: true
+        Value: false
       Enabled: true
-      Keep: 100
+      Keep: 1
       Name: Odometry
       Position Tolerance: 0.10000000149011612
       Shape:
         Alpha: 1
         Axes Length: 0.10000000149011612
         Axes Radius: 0.009999999776482582
-        Color: 255; 25; 0
+        Color: 53; 132; 228
         Head Length: 0.30000001192092896
         Head Radius: 0.10000000149011612
         Shaft Length: 1
@@ -463,25 +406,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/ThirdPersonFollower
-      Distance: 9.722128868103027
+      Distance: 40.3330078125
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: -1.1111301183700562
-        Y: -1.89801824092865
-        Z: -1.0318763088434935e-06
+        X: -4.627260684967041
+        Y: -1.3063030242919922
+        Z: -7.93457729741931e-07
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: -0.1151924878358841
+      Pitch: 1.1797966957092285
       Target Frame: base_link
       Value: ThirdPersonFollower (rviz_default_plugins)
-      Yaw: 2.8467509746551514
+      Yaw: 3.2567591667175293
     Saved: ~
 Window Geometry:
   Displays:

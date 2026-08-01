@@ -103,11 +103,11 @@ def generate_launch_description():
     # )
     
     # STATIC TF BRIDGE
-    tf_map_odom = Node(
-        package='tf2_ros',
-        executable='static_transform_publisher',
-        arguments=['-34.5', '-10.25', '0', '0', '0', '0', 'map', 'odom'] 
-    )
+    # tf_map_odom = Node(
+    #     package='tf2_ros',
+    #     executable='static_transform_publisher',
+    #     arguments=['-34.5', '-10.25', '0', '0', '0', '0', 'map', 'odom'] 
+    # )
 
     # MAP SERVER
     map_server = Node(
@@ -115,7 +115,7 @@ def generate_launch_description():
         executable='map_server',
         name='map_server',
         parameters=[
-            {'yaml_filename': os.path.join(pkg_ice_nav, 'maps', 'PerfectRefinedMap3.yaml')},
+            {'yaml_filename': os.path.join(pkg_ice_nav, 'maps', 'PerfectRefinedMap4.yaml')},
             {'use_sim_time': True}  # <-- Add this line
         ]
     )
@@ -124,7 +124,10 @@ def generate_launch_description():
         package='nav2_lifecycle_manager',
         executable='lifecycle_manager',
         name='lifecycle_manager_map',
-        parameters=[{'autostart': True}, {'node_names': ['map_server']}]
+        parameters=[
+            {'use_sim_time': True},
+            {'autostart': True},   
+            {'node_names': ['map_server', 'amcl']}]
     )
 
     # CONTROLLER SPAWNERS
@@ -168,6 +171,14 @@ def generate_launch_description():
         'config',
         'nav2_params.yaml'
     )
+
+    amcl_node = Node(
+        package='nav2_amcl',
+        executable='amcl',
+        name='amcl',
+        output='screen',
+        parameters=[nav2_params_path]
+    )
     
     start_nav2_cmd = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
@@ -185,14 +196,15 @@ def generate_launch_description():
         spawn_entity,
         sensor_bridge,
         gz_odom_bridge,      
-        tf_map_odom,         
+        # tf_map_odom,         
         map_server,          
         lifecycle_manager_map, 
         diff_drive_spawner,  
         ackermann_spawner,
         conditioner_spawner,    
         start_ekf_node,
-        start_nav2_cmd
+        start_nav2_cmd,
+        amcl_node
         # tf_base_footprint
         #static_transform_publisher
     ])
