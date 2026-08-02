@@ -110,15 +110,15 @@ def generate_launch_description():
     # )
 
     # MAP SERVER
-    map_server = Node(
-        package='nav2_map_server',
-        executable='map_server',
-        name='map_server',
-        parameters=[
-            {'yaml_filename': os.path.join(pkg_ice_nav, 'maps', 'PerfectRefinedMap4.yaml')},
-            {'use_sim_time': True}  # <-- Add this line
-        ]
-    )
+    # map_server = Node(
+    #     package='nav2_map_server',
+    #     executable='map_server',
+    #     name='map_server',
+    #     parameters=[
+    #         {'yaml_filename': os.path.join(pkg_ice_nav, 'maps', 'PerfectRefinedMap4.yaml')},
+    #         {'use_sim_time': True}  # <-- Add this line
+    #     ]
+    # )
     
     lifecycle_manager_map = Node(
         package='nav2_lifecycle_manager',
@@ -172,13 +172,13 @@ def generate_launch_description():
         'nav2_params.yaml'
     )
 
-    amcl_node = Node(
-        package='nav2_amcl',
-        executable='amcl',
-        name='amcl',
-        output='screen',
-        parameters=[nav2_params_path]
-    )
+    # amcl_node = Node(
+    #     package='nav2_amcl',
+    #     executable='amcl',
+    #     name='amcl',
+    #     output='screen',
+    #     parameters=[nav2_params_path]
+    # )
     
     start_nav2_cmd = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
@@ -197,14 +197,14 @@ def generate_launch_description():
         sensor_bridge,
         gz_odom_bridge,      
         # tf_map_odom,         
-        map_server,          
+        #map_server,          
         lifecycle_manager_map, 
         diff_drive_spawner,  
         ackermann_spawner,
         conditioner_spawner,    
         start_ekf_node,
-        start_nav2_cmd,
-        amcl_node
+        start_nav2_cmd
+        #amcl_node
         # tf_base_footprint
         #static_transform_publisher
     ])

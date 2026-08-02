@@ -1,0 +1,29 @@
+slam_toolbox:
+  ros__parameters:
+    use_sim_time: true
+
+    # FRAMES AND TOPICS
+    odom_frame: "odom"             # Your local odometry frame
+    map_frame: "map"               # The global map frame
+    base_frame: "base_link"        # explicitly overriding base_footprint!
+    scan_topic: "/scan"            # Your Zamboni's LiDAR topic
+
+    # MAP & LASER PARAMETERS
+    resolution: 0.05               # 5cm per pixel (standard for Nav2)
+    map_update_interval: 2.0       # How often the map updates in seconds
+    max_laser_range: 70.0          # Matched to your custom URDF
+    minimum_time_interval: 0.5     # Process a scan every 0.5 seconds
+
+    # MOVEMENT TRACKING
+    use_scan_matching: true        #
+    use_scan_barycenter: true      #
+    minimum_travel_distance: 0.3   # Update map after moving 0.3m
+    minimum_travel_heading: 0.3    # Update map after turning 0.3 rad
+
+    # CERES SOLVER (Standard Defaults)
+    solver_plugin: solver_plugins::CeresSolver
+    ceres_linear_solver: SPARSE_NORMAL_CHOLESKY
+    ceres_preconditioner: SCHUR_JACOBI
+    ceres_trust_strategy: LEVENBERG_MARQUARDT
+    ceres_dogleg_type: TRADITIONAL_DOGLEG
+    ceres_loss_function: None

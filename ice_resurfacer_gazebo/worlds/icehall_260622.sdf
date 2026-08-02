@@ -126,7 +126,7 @@
         <visual name="rink_visual">
           <geometry>
             <mesh>
-              <uri>model://ice_resurfacer_gazebo/meshes/boards_260622.stl</uri>
+              <uri>model://ice_resurfacer_gazebo/meshes/boardswithobstacles_260802.stl</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -138,7 +138,7 @@
         <collision name="rink_collision">
           <geometry>
             <mesh>
-              <uri>model://ice_resurfacer_gazebo/meshes/boards_260622.stl</uri>
+              <uri>model://ice_resurfacer_gazebo/meshes/boardswithobstacles_260802.stl</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -147,7 +147,7 @@
         <visual name="utilities_visual">
           <geometry>
             <mesh>
-              <uri>model://ice_resurfacer_gazebo/meshes/buildings.stl</uri>
+              <uri>model://ice_resurfacer_gazebo/meshes/environment_260802.stl</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -159,7 +159,7 @@
         <collision name="utilities_collision">
           <geometry>
             <mesh>
-              <uri>model://ice_resurfacer_gazebo/meshes/buildings.stl</uri>
+              <uri>model://ice_resurfacer_gazebo/meshes/environment_260802.stl</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
