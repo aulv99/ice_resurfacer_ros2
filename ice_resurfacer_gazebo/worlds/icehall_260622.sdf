@@ -57,7 +57,7 @@
           <surface>
             <friction>
               <ode>
-                <mu>0.25</mu> <mu2>0.25</mu2>
+                <mu>0.6</mu> <mu2>0.6</mu2>
               </ode>
             </friction>
           </surface>
@@ -106,7 +106,7 @@
           <geometry>
             <plane>
               <normal>0 0 1</normal>
-              <size>100 80</size>
+              <size>110 80</size>
             </plane>
           </geometry>
           <material>
@@ -126,7 +126,7 @@
         <visual name="rink_visual">
           <geometry>
             <mesh>
-              <uri>model://ice_resurfacer_gazebo/meshes/boardswithobstacles_260802.stl</uri>
+              <uri>model://ice_resurfacer_gazebo/meshes/boards_260622.stl</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -138,7 +138,7 @@
         <collision name="rink_collision">
           <geometry>
             <mesh>
-              <uri>model://ice_resurfacer_gazebo/meshes/boardswithobstacles_260802.stl</uri>
+              <uri>model://ice_resurfacer_gazebo/meshes/boards_260622.stl</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
