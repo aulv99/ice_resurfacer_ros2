@@ -216,11 +216,11 @@ amcl:
     use_sim_tim: True
     # odometry noise model
     robot_model_type: "nav2_amcl::DifferentialMotionModel"
-    alpha1: 0.35
-    alpha2: 0.35
-    alpha3: 0.35
-    alpha4: 0.35
-    alpha5: 0.2
+    alpha1: 0.2 # Rotation from rotation
+    alpha2: 0.05 # Rotation from translation
+    alpha3: 0.1 # Translation from translation
+    alpha4: 0.35 # Translation from rotation
+    alpha5: 0.2 # Translation noise (Only omni-models)
 
     # frames
     base_frame_id: "base_link"
@@ -234,8 +234,8 @@ amcl:
     laser_model_type: "likelihood_field"
     max_beams: 360
 
-    max_particles: 2000 # Increase if needed
-    min_particles: 500 
+    max_particles: 2500 # Defalt 2000
+    min_particles: 750 # Default 500
     pf_err: 0.05
     pf_z: 0.99
 

@@ -203,8 +203,8 @@ def generate_full_wall_lap_bottom(offset_straight, offset_corner, start_x, end_x
 def generate_zamboni_path():
     px, py, pv = [], [], []
 
-    margin_straight = 0.03
-    margin_corner = 0.06
+    margin_straight = 0.15# 0.03
+    margin_corner = 0.25 # 0.06
     first_offset_straight = CONDITIONER_WIDTH/2 + margin_straight
     first_offset_corner = CONDITIONER_WIDTH/2 + margin_corner
 
