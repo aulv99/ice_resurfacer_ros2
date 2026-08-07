@@ -302,6 +302,7 @@ class ZamboniMasterNode(Node):
         self._nav_to_pose_client = ActionClient(self, NavigateToPose, 'navigate_to_pose')
         # self._conditioner_client = ActionClient(self, FollowJointTrajectory, '/conditioner_controller/follow_joint_trajectory')
         self.state_pub = self.create_publisher(String, '/mission_state', 10)
+        self.rviz_path_pub = self.create_publisher(Path, '/zamboni_static_path', 10) # Publisher for static trajectory
 
         # ROS2 Service Server
         self.start_srv = self.create_service(Trigger, '/start_sequence', self.start_callback)
@@ -404,7 +405,10 @@ class ZamboniMasterNode(Node):
                 self.start_exit_maneuver_3a()
                 return
 
-            lookahead_dist = 2.5  
+            # lookahead_dist = 2.5  # Static lookahead distance
+            actual_v = msg.twist.twist.linear.x # forward velocity from EKF
+            lookahead_dist = max(0.8, min(2.5, actual_v * 1.5))
+
             lookahead_idx = self.current_path_index
             
             while lookahead_idx < len(self.path_x) - 1:
@@ -420,8 +424,14 @@ class ZamboniMasterNode(Node):
             alpha = math.atan2(target_y - ry, target_x - rx) - ryaw
             alpha = math.atan2(math.sin(alpha), math.cos(alpha)) 
 
+            
             curvature = (2.0 * math.sin(alpha)) / lookahead_dist
-            angular_velocity = target_v * curvature
+            # OLD CALCULATION
+            # angular_velocity = target_v * curvature
+
+            # Calculating steering with actual velocity
+            calc_v = max(0.1, actual_v)
+            angular_velocity = calc_v * curvature
 
             twist = Twist()
             twist.linear.x = float(target_v)
@@ -527,6 +537,39 @@ class ZamboniMasterNode(Node):
     def start_phase_2_resurfacing(self):
         self.get_logger().info('Vaihe 2: Jäänajo aloitettu...')
         px, py, pv = generate_zamboni_path()
+
+        # Rviz path visualization
+        path_msg = Path()
+        path_msg.header.frame_id = 'map'
+        path_msg.header.stamp = self.get_clock().now().to_msg()
+
+        # Loop through your arrays and build the PoseStamped messages
+        for i in range(len(px) - 1):
+            pose = PoseStamped()
+            pose.header = path_msg.header
+            pose.pose.position.x = float(px[i])
+            pose.pose.position.y = float(py[i])
+            pose.pose.position.z = 0.0
+
+            # calculating the yaw for Rviz arrows
+            dy = py[i+1] - py[i]
+            dx = px[i+1] - px[i]
+            yaw = math.atan2(dy, dx)
+            pose.pose.orientation = get_quaternion_from_yaw(yaw)
+
+            path_msg.poses.append(pose)
+
+        # append the very last point
+        if len(px) > 0:
+            final_pose = PoseStamped()
+            final_pose.header = path_msg.header
+            final_pose.pose.position.x = float(px[-1])
+            final_pose.pose.position.y = float(py[-1])
+            final_pose.pose.orientation = path_msg.poses[-1].pose.orientation if len(path_msg.poses) > 0 else get_quaternion_from_yaw(0.0)
+            path_msg.poses.append(final_pose)
+
+        # publish to Rviz
+        self.rviz_path_pub.publish(path_msg)
 
         # self.set_conditioner_position(0.2)
         self.path_x = np.array(px)
