@@ -103,11 +103,11 @@ def generate_launch_description():
     # )
     
     # STATIC TF BRIDGE
-    # tf_map_odom = Node(
-    #     package='tf2_ros',
-    #     executable='static_transform_publisher',
-    #     arguments=['-34.5', '-10.25', '0', '0', '0', '0', 'map', 'odom'] 
-    # )
+    tf_map_odom = Node(
+        package='tf2_ros',
+        executable='static_transform_publisher',
+        arguments=['-34.5', '-10.25', '0', '0', '0', '0', 'map', 'odom'] 
+    )
 
     # MAP SERVER
     map_server = Node(
@@ -127,7 +127,7 @@ def generate_launch_description():
         parameters=[
             {'use_sim_time': True},
             {'autostart': True},   
-            {'node_names': ['map_server', 'amcl']}]
+            {'node_names': ['map_server']}]
     )
 
     # CONTROLLER SPAWNERS
@@ -172,13 +172,13 @@ def generate_launch_description():
         'nav2_params.yaml'
     )
 
-    amcl_node = Node(
-        package='nav2_amcl',
-        executable='amcl',
-        name='amcl',
-        output='screen',
-        parameters=[nav2_params_path]
-    )
+    # amcl_node = Node(
+    #     package='nav2_amcl',
+    #     executable='amcl',
+    #     name='amcl',
+    #     output='screen',
+    #     parameters=[nav2_params_path]
+    # )
     
     start_nav2_cmd = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
@@ -196,15 +196,15 @@ def generate_launch_description():
         spawn_entity,
         sensor_bridge,
         gz_odom_bridge,      
-        # tf_map_odom,         
+        tf_map_odom,         
         map_server,          
         lifecycle_manager_map, 
         diff_drive_spawner,  
         ackermann_spawner,
         conditioner_spawner,    
         start_ekf_node,
-        start_nav2_cmd,
-        amcl_node
+        start_nav2_cmd
+        # amcl_node
         # tf_base_footprint
         #static_transform_publisher
     ])

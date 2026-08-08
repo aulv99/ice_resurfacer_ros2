@@ -13,6 +13,8 @@ from control_msgs.action import FollowJointTrajectory
 from trajectory_msgs.msg import JointTrajectoryPoint
 from std_msgs.msg import String
 from std_srvs.srv import Trigger
+from tf2_ros import Buffer, TransformListener
+from tf2_ros import TransformException
 
 # ============================================================
 # RINK & ZAMBONI PARAMETERS
@@ -26,10 +28,10 @@ SAFETY_MARGIN = 0.10
 POINT_SPACING = 0.10
 
 # --- THE SPEED PROFILES ---
-WALL_STRAIGHT_SPEED = 0.5 # 2.0
-WALL_CORNER_SPEED = 0.5 # 1.0
-SWEEP_STRAIGHT_SPEED = 0.5 # 2.0
-SWEEP_CORNER_SPEED = 0.5 # 1.5
+WALL_STRAIGHT_SPEED = 2.0
+WALL_CORNER_SPEED = 1.0
+SWEEP_STRAIGHT_SPEED = 2.0
+SWEEP_CORNER_SPEED = 1.5
 
 # ============================================================
 # GEOMETRY HELPERS 
@@ -307,6 +309,10 @@ class ZamboniMasterNode(Node):
         # ROS2 Service Server
         self.start_srv = self.create_service(Trigger, '/start_sequence', self.start_callback)
         self.stop_srv = self.create_service(Trigger, '/stop_sequence', self.stop_callback)
+
+        # --- TF2 Listener ---
+        self.tf_buffer = Buffer()
+        self.tf_listener = TransformListener(self.tf_buffer, self)
         
         # We need a variable to track if we are allowed to run
         self.is_running = False
@@ -376,16 +382,32 @@ class ZamboniMasterNode(Node):
         # ----------------------------------------------------
         # PHASE 2: RESURFACING PURE PURSUIT
         # ----------------------------------------------------
-        if self.mission_state == 'RESURFACING': 
-            rx = msg.pose.pose.position.x
-            ry = msg.pose.pose.position.y
+        if self.mission_state == 'RESURFACING':
+            # Ask TF2 for the robot position in the MAP frame 
+            try: 
+                t = self.tf_buffer.lookup_transform(
+                    'map',
+                    'base_link',
+                    rclpy.time.Time()
+                ) 
+            except TransformException as ex:
+                self.get_logger().warn(f'Could not transform base_link to map: {ex}')
+                return
             
-            q = msg.pose.pose.orientation
+            # rx = msg.pose.pose.position.x
+            # ry = msg.pose.pose.position.y
+            # q = msg.pose.pose.orientation
+
+            # using map coordinates
+            rx = t.transform.translation.x
+            ry = t.transform.translation.y
+            q = t.transform.rotation
+
             siny_cosp = 2 * (q.w * q.z + q.x * q.y)
             cosy_cosp = 1 - 2 * (q.y * q.y + q.z * q.z)
             ryaw = math.atan2(siny_cosp, cosy_cosp)
 
-            search_window = 100 
+            search_window = 30 # 100 # 30 = 3 meters, 100 = 10 meters
             start_idx = self.current_path_index
             end_idx = min(start_idx + search_window, len(self.path_x))
             
@@ -405,9 +427,9 @@ class ZamboniMasterNode(Node):
                 self.start_exit_maneuver_3a()
                 return
 
-            # lookahead_dist = 2.5  # Static lookahead distance
-            actual_v = msg.twist.twist.linear.x # forward velocity from EKF
-            lookahead_dist = max(0.8, min(2.5, actual_v * 1.5))
+            lookahead_dist = 4.0 # 2.5  # Static lookahead distance
+            # actual_v = msg.twist.twist.linear.x # forward velocity from EKF
+            # lookahead_dist = max(0.8, min(2.5, actual_v * 1.5))
 
             lookahead_idx = self.current_path_index
             
@@ -427,11 +449,11 @@ class ZamboniMasterNode(Node):
             
             curvature = (2.0 * math.sin(alpha)) / lookahead_dist
             # OLD CALCULATION
-            # angular_velocity = target_v * curvature
+            angular_velocity = target_v * curvature
 
             # Calculating steering with actual velocity
-            calc_v = max(0.1, actual_v)
-            angular_velocity = calc_v * curvature
+            # calc_v = max(0.1, actual_v)
+            # angular_velocity = calc_v * curvature
 
             twist = Twist()
             twist.linear.x = float(target_v)
