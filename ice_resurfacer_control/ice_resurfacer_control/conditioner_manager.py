@@ -24,7 +24,7 @@ class ConditionerManager(Node):
         self.MAX_FUEL_CAPACITY = 100.0
         self.current_fuel_capacity = self.MAX_FUEL_CAPACITY      
         self.current_water_capacity = self.MAX_TANK_CAPACITY
-        self.WATER_FLOW_RATE = 0.2
+        self.WATER_FLOW_RATE = 0.5
         self.current_valve_opening = 0.0
         self.current_velocity = 0.0
 
@@ -35,7 +35,7 @@ class ConditionerManager(Node):
         self.timer = self.create_timer(self.dt, self.control_loop)
 
         # ---------------------------------------------------------
-        # SUBSCRIBERS (Listening to the Master Node & Chassis)
+        # SUBSCRIBERS 
         # ---------------------------------------------------------
         # Listens to autonomy_seq.py for state changes (e.g., 'RESURFACING')
         self.state_sub = self.create_subscription(
@@ -81,7 +81,7 @@ class ConditionerManager(Node):
         )
 
         # ---------------------------------------------------------
-        # ACTION CLIENT (Migrated from autonomy_seq.py)
+        # ACTION CLIENT 
         # ---------------------------------------------------------
         self._conditioner_client = ActionClient(
             self, 
@@ -93,17 +93,17 @@ class ConditionerManager(Node):
     # CALLBACKS & LOGIC
     # ============================================================
 
+    # Triggered whenever autonomy_seq.py broadcasts a new phase
     def state_callback(self, msg):
-        """ Triggered whenever autonomy_seq.py broadcasts a new phase """
         previous_state = self.current_mission_state
         self.current_mission_state = msg.data
 
-        if self.current_mission_state == 'RESURFACING' and previous_state != 'RESURFACING':
+        if self.current_mission_state == 'PHASE_2' and previous_state != 'PHASE_2':
             self.get_logger().info("Lasketaan jäädytin ja käynnistetään lumikairat.")
             self.set_conditioner_lift(0.2)  # Drop blade
             # self.set_auger_speed(self.MAX_AUGER_SPEED)
             
-        elif self.current_mission_state in ['TRANSITING_EXIT', 'IDLE'] and previous_state == 'RESURFACING':
+        elif self.current_mission_state in ['PHASE_3A', 'IDLE'] and previous_state == 'PHASE_2':
             self.get_logger().info("Nostetaan jäädytin, pysäytetään lumikairat, ja katkaistaan vesisyöttö")
             self.set_conditioner_lift(-0.2) # Lift blade
             # self.set_auger_speed(0.0)
@@ -111,7 +111,7 @@ class ConditionerManager(Node):
 
     def velocity_callback(self, msg):
         """ Feedforward control for the water valve based on vehicle speed and auger control"""
-        if self.current_mission_state == 'RESURFACING':
+        if self.current_mission_state == 'PHASE_2':
             current_speed = abs(msg.linear.x) # Added absolute value to avoid issues reversing
             MAX_VEHICLE_SPEED = 2.0
             speed_ratio = min(current_speed / MAX_VEHICLE_SPEED, 1.0)
@@ -130,20 +130,20 @@ class ConditionerManager(Node):
     # HARDWARE COMMAND HELPERS
     # ============================================================
 
+    # Publishes the target velocity to both horizontal and vertical augers
     def set_auger_speed(self, speed):
-        """ Publishes the target velocity to both horizontal and vertical augers """
         msg = Float64MultiArray()
         msg.data = [float(speed), float(speed)]
         self.auger_pub.publish(msg)
 
+    # Publishes the target position (0.0 to 1.00) to the water valve 
     def set_water_valve(self, position_rad):
-        """ Publishes the target position (0.0 to 1.00) to the water valve """
         msg = Float64MultiArray()
         msg.data = [float(position_rad)]
         self.water_pub.publish(msg)
 
+    # Executes the conditioner movement
     def set_conditioner_lift(self, target_position, duration_sec=3):
-        """ Handles the heavy mechanical lift. Exactly as it was in your old script. """
         if not self._conditioner_client.wait_for_server(timeout_sec=2.0):
             self.get_logger().error('Conditioner Action Server not available!')
             return
@@ -156,30 +156,30 @@ class ConditionerManager(Node):
         
         goal_msg.trajectory.points = [point]
         self._conditioner_client.send_goal_async(goal_msg)
-    
+
+    # Control loop that runs automatically every 0.1 seconds
     def control_loop(self):
-        """This function runs automatically every 0.1 seconds."""
         
-        # 1. Calculate how much water we sprayed in the last 0.1 seconds
+        # Calculate how much water we sprayed in the last 0.1 seconds
         water_consumed = self.current_valve_opening * self.WATER_FLOW_RATE * self.dt
         fuel_consumed = self.current_velocity * 0.01 * self.dt
         
-        # 2. Drain the tank (using max() so it never goes below 0)
+        # Drain the tank (using max() so it never goes below 0)
         self.current_water_capacity = max(self.current_water_capacity - water_consumed, 0.0)
         self.current_fuel_capacity = max(self.current_fuel_capacity - fuel_consumed, 0.0)
         
-        # 3. Calculate the percentage for the UI (0.0 to 100.0)
+        # Calculate the percentage for the UI (0.0 to 100.0)
         tank_percentage = (self.current_water_capacity / self.MAX_TANK_CAPACITY) * 100.0
         fuel_percentage = (self.current_fuel_capacity / self.MAX_FUEL_CAPACITY) * 100.0
         
         # Level alarms
-        if tank_percentage < 50.0:
+        if tank_percentage <= 50.0 and not self.water_50_warned:
             self.get_logger().info("Vesisäiliön taso 50%")
-            return
+            self.water_50_warned = True
         
-        if fuel_percentage < 15.0:
+        if fuel_percentage == 15.0 and not self.fuel_15_warned:
             self.get_logger().info("Polttoaine lopussa. Tankkaa ajoneuvo.")
-            return
+            self.fuel_15_warned = True
 
         # 4. Publish it to the ROS 2 network
         msg = Float64()

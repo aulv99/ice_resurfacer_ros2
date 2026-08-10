@@ -12,7 +12,7 @@ def generate_launch_description():
     xacro_file = os.path.join(pkg_share, 'urdf', 'ice_resurfacer4.urdf.xacro')
 
     # RViz config
-    config_file = os.path.join(pkg_share, 'rviz', 'rviz_config1.rviz')
+    config_file = os.path.join(pkg_share, 'rviz', 'odometry.rviz')
 
     # RViz2 
     rviz = Node(

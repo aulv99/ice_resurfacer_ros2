@@ -174,28 +174,24 @@ const stateListener = new ROSLIB.Topic({
     messageType : 'std_msgs/String'
 });
 
-stateListener.subscribe((message) => {
-    // message.data contains your string (e.g., 'RESURFACING')
-    let operationState = message.data;
-    let operaatio = "Vikatilanne"
+const stateDict = {
+    "IDLE": "Valmiudessa",
+    "PHASE_1A": "1A: Ajetaan jäälle",
+    "PHASE_1B": "1B: Jäänajon valmistelu",
+    "PHASE_2": "2: Jäänajo",
+    "PHASE_3A": "3A: Ajetaan pois jäältä",
+    "PHASE_3B": "3B: Ajetaan lumentyhjäyspaikalle",
+    "PHASE_3C": "3C: Peruutetaan pois lumentyhjäyspaikalta",
+    "PHASE_3D": "3D: Ajetaan takaisin talliin"
+};
 
-    if (operationState == 'RESURFACING') {
-        operaatio = "Ajetaan jäätä"
-    } else if (operationState == 'IDLE') {
-        operaatio = "Valmiudessa"
-    } else if (operationState == 'TRANSITING_EXIT') {
-        operaatio = "Ajetaan ulos jäältä"
-    } else if (operationState == 'REVERSING_OUT_OF_PIT') {
-        operaatio = "Poistutaan lumikasalta"
-    } else if (operationState == 'TRANSITING_ESCAPE') {
-        operaatio = "Ajetaan jäälle"
-    } else if (operationState == 'NAVIGATING') {
-        operaatio = "Ajetaan talliin"
-    } else if (operationState == 'TRANSITING_STAGING') {
-        operaatio = "Valmistellaan jäänajoa"
-    } else {
-        operaatio = "Virhe"
-    }
+stateListener.subscribe((message) => {
+    let operationState = message.data;
+    
+    // Look up the phase in the dictionary. 
+    // The " || 'Virhe' " part is a fallback: if the state isn't found, it defaults to 'Virhe'.
+    let operaatio = stateDict[operationState] || "Virhe";
+
     document.getElementById('val-op').innerText = operaatio;
 });
 
@@ -318,9 +314,9 @@ conditionerListener.subscribe((message) => {
     // state logic
     let stateText = "Asentovirhe"
     if (condPos > 0.1) {
-        stateText = "Alhalla"
+        stateText = "Alhaalla"
     } else {
-        stateText = "Ylhällä"
+        stateText = "Ylhäällä"
     }
     document.getElementById('val-cond').innerText = stateText;
 });
@@ -373,6 +369,17 @@ const fuelListener = new ROSLIB.Topic({
 fuelListener.subscribe((message) => {
     // Formatting to 0 decimals so it reads smoothly like "98%"
     document.getElementById('val-fuel').innerText = message.data.toFixed(0) + " %";  
+});
+
+const coverageListener = new ROSLIB.Topic({
+    ros: ros,
+    name: '/ice_coverage_percent',
+    messageType: 'std_msgs/Float32'
+});
+
+coverageListener.subscribe((message) => {
+    // message.data is a float like 45.1234
+    document.getElementById('val-coverage').innerText = message.data.toFixed(1) + " %";
 });
 
  // ==========================================
@@ -440,7 +447,7 @@ rosoutListener.subscribe((message) => {
         levelText = 'ERROR';
     }
 
-    const allowedNodes = ['zamboni_master_node', 'conditioner_manager'];
+    const allowedNodes = ['Zamboni_AI', 'conditioner_manager'];
 
     if (!allowedNodes.includes(message.name)) {
         return;

@@ -23,7 +23,7 @@ def generate_launch_description():
     autonomy_node = Node(
         package='ice_resurfacer_control',
         executable='autonomy_node',
-        name='zamboni_master_node',
+        name='Zamboni_AI',
         output='screen' # Prints your Phase tracking to the terminal
     )
 
