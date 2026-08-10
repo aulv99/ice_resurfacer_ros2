@@ -82,11 +82,20 @@
     </div>
 
     <div id="view-charts" class="view-section" style="display: none;">
-        <!-- Move your big alarm panel here -->
-        <div class="panel" style="height: 500px;">
-            <div class="chart-container" style="height: 100%;">
-                <canvas id="multiTrendChart"></canvas>
-            </div>
+        <div class="panel" style="height: 600px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+            <div class="system-header" style="width: 100%; text-align: center;">Jäänajon status</div>
+            
+            <!-- NEW CANVAS FOR OCCUPANCY GRID -->
+            <!-- The pixelated rendering ensures the grid stays sharp when scaled up -->
+            <div style="position: relative; width: 100%; height: 500px; display: flex; justify-content: center;">
+                
+                <!-- Bottom Layer: The Ice Coverage Map -->
+                <canvas id="coverageMapCanvas" style="position: absolute; max-height: 100%; object-fit: contain; image-rendering: pixelated; z-index: 1;"></canvas>
+                
+                <!-- Top Layer: The Zamboni Icon -->
+                <canvas id="robotCanvas" style="position: absolute; max-height: 100%; object-fit: contain; z-index: 2; pointer-events: none;"></canvas>
+            
+            </div>            
         </div>
     </div>
 

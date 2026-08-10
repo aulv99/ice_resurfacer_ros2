@@ -99,6 +99,11 @@ let pathData = [];
 // Global variables for Trend Sampling
 let latestCmdVel = 0.0;
 let latestOdomVel = 0.0;
+let mapResolution = 0.1; // Default 5cm
+let mapOriginX = 0.0;
+let mapOriginY = 0.0;
+let mapWidth = 100;
+let mapHeight = 100;
 
 
 // ==========================================
@@ -215,90 +220,144 @@ const odomListener = new ROSLIB.Topic({
 });
 
 odomListener.subscribe((message) => {
-    let posX = message.pose.pose.position.x;
-    let posY = message.pose.pose.position.y;
+    // 1. Raw ROS Coordinates
+    let rawX = message.pose.pose.position.x;
+    let rawY = message.pose.pose.position.y;
 
+    // 2. Update the Text UI
     let realVel = message.twist.twist.linear.x * 3.6;
     document.getElementById('val-fb-vel').innerText = realVel.toFixed(2) + " km/h";  
 
+    // ==========================================
+    // 3. MAIN PAGE: SCATTER PLOT
+    // ==========================================
+    let plotX = rawX - 34.5;
+    let plotY = rawY - 10.25;
+
     let posData = positionChart.data.datasets[0].data;
-    posData.push({x: posX, y: posY});
+    posData.push({x: plotX, y: plotY});
     if (posData.length > 10000) {
         posData.shift(); 
     }
-    positionChart.update();
+    positionChart.update(); 
 
-    let velData = velocityChart.data.datasets[0].data;
-    velData.push(realVel);
-    velData.shift(); 
-    velocityChart.update()
+    // ==========================================
+    // 4. KAAVIOT PAGE: LIVE ZAMBONI ICON
+    // ==========================================
+    const robotCanvas = document.getElementById('robotCanvas');
+    
+    if (robotCanvas) {
+        const ctxRobot = robotCanvas.getContext('2d');
+
+        // Convert ROS Meters to Canvas Pixels
+        let pixelX = (plotX - mapOriginX) / mapResolution;
+        
+        // Flip the Y-axis!
+        let pixelY = mapHeight - ((plotY - mapOriginY) / mapResolution);
+
+        // Clear the previous frame
+        ctxRobot.clearRect(0, 0, mapWidth, mapHeight);
+
+        // Extract Yaw (rotation)
+        let q = message.pose.pose.orientation;
+        let yaw = Math.atan2(2.0 * (q.w * q.z + q.x * q.y), 1.0 - 2.0 * (q.y * q.y + q.z * q.z));
+
+        // Draw the Red Triangle Icon
+        ctxRobot.save();
+        ctxRobot.translate(pixelX, pixelY);
+        ctxRobot.rotate(-yaw); 
+
+        ctxRobot.fillStyle = '#ff1744'; 
+        ctxRobot.beginPath();
+        ctxRobot.moveTo(8, 0);     
+        ctxRobot.lineTo(-6, 5);    
+        ctxRobot.lineTo(-6, -5);   
+        ctxRobot.fill();
+        ctxRobot.restore();
+    }
+    
     latestOdomVel = realVel;
 });
+// ==========================================
+// Occupancy Grid
+// ==========================================
+const coverageMapCanvas = document.getElementById('coverageMapCanvas');
+const ctxCoverage = coverageMapCanvas.getContext('2d');
 
-// ==========================================
-// MULTI-TREND VIEWER (Page 3)
-// ==========================================
-const ctxTrend = document.getElementById('multiTrendChart').getContext('2d');
-const multiTrendChart = new Chart(ctxTrend, {
-    type: 'line',
-    data: {
-        labels: Array(100).fill(''), // 100 data points on the X-axis
-        datasets: [
-            {
-                label: 'Nopeusohje (km/h)', // Dataset 0
-                data: Array(100).fill(0),
-                borderColor: '#3399FF', // alkuAI Blue
-                borderWidth: 2,
-                tension: 0.2,
-                pointRadius: 0
-            },
-            {
-                label: 'Todellinen nopeus (km/h)', // Dataset 1
-                data: Array(100).fill(0),
-                borderColor: '#00E676', // Neon Green
-                borderWidth: 2,
-                tension: 0.2,
-                pointRadius: 0
-            }
-        ]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-            y: {  min: -5, max: 10,
-                title: {display: true, text: 'Nopeus (km/h)', color: '#aaaaaa'},
-                grid: { color: 'rgba(255, 255, 255, 0.1)' },
-                ticks: { color: '#888888' }
-            },
-            x: { display: false }
-        },
-        plugins: { 
-            legend: { 
-                display: true, 
-                labels: { color: '#e0e0e0' } 
-            } 
-        },
-        animation: false
-    }
+const gridListener = new ROSLIB.Topic({
+    ros : ros,
+    name : '/ice_coverage_map',
+    messageType : 'nav_msgs/OccupancyGrid'
 });
 
-setInterval(() => {
-    // 1. Grab the arrays for both lines
-    let cmdData = multiTrendChart.data.datasets[0].data;
-    let odomData = multiTrendChart.data.datasets[1].data;
+gridListener.subscribe((message) => {
+    const width = message.info.width;
+    const height = message.info.height;
+    const data = message.data; // 1D array of int8 values
 
-    // 2. Push the latest values simultaneously
-    cmdData.push(latestCmdVel);
-    odomData.push(latestOdomVel);
+    mapResolution = message.info.resolution;
+    mapOriginX = message.info.origin.position.x;
+    mapOriginY = message.info.origin.position.y;
+    mapWidth = width;
+    mapHeight = height;
 
-    // 3. Shift the oldest data off the front to maintain the 100-point window
-    cmdData.shift();
-    odomData.shift();
+    // 1. Adjust internal canvas resolution to match the ROS grid exactly
+    if (coverageMapCanvas.width !== width || coverageMapCanvas.height !== height) {
+        coverageMapCanvas.width = width;
+        coverageMapCanvas.height = height;
 
-    // 4. Update the chart once
-    multiTrendChart.update();
-}, 200);
+        const robotCanvas = document.getElementById('robotCanvas');
+        robotCanvas.width = width;
+        robotCanvas.height = height;
+    
+    }
+
+    // 2. Create an ImageData object to manipulate pixels directly
+    const imgData = ctxCoverage.createImageData(width, height);
+    const pixelData = imgData.data; // This is a 1D array of RGBA values (4 bytes per pixel)
+
+    // 3. Loop through the ROS Occupancy Grid data
+    for (let i = 0; i < data.length; i++) {
+        const gridValue = data[i];
+
+        // Determine X, Y coordinates in the ROS grid
+        const x = i % width;
+        const y = Math.floor(i / width);
+        
+        // ROS grids have origin at bottom-left, Canvas is top-left.
+        // We MUST flip the Y axis so the map draws right-side up!
+        const flippedY = (height - 1) - y;
+        
+        // Calculate the starting index for this pixel in the RGBA array
+        const pixelIndex = (flippedY * width + x) * 4;
+
+        // 4. Color Assignment
+        if (gridValue === -1) {
+            // Unknown / Outside map (Dark Grey to match the panel background)
+            pixelData[pixelIndex] = 28;      // R
+            pixelData[pixelIndex + 1] = 28;  // G
+            pixelData[pixelIndex + 2] = 30;  // B
+            pixelData[pixelIndex + 3] = 255; // Alpha (Opacity)
+            
+        } else if (gridValue === 0) {
+            // Free space / Untreated Ice (Light icy white)
+            pixelData[pixelIndex] = 230;    
+            pixelData[pixelIndex + 1] = 235;
+            pixelData[pixelIndex + 2] = 240;
+            pixelData[pixelIndex + 3] = 255;
+            
+        } else {
+            // Covered/Occupied (alkuAI Blue - #a1b9ce)
+            pixelData[pixelIndex] = 161;     
+            pixelData[pixelIndex + 1] = 185;
+            pixelData[pixelIndex + 2] = 206;
+            pixelData[pixelIndex + 3] = 255;
+        }
+    }
+
+    // 5. Draw the generated image array directly to the canvas
+    ctxCoverage.putImageData(imgData, 0, 0);
+});
 
 
 // Conditioner state
@@ -468,15 +527,15 @@ rosoutListener.subscribe((message) => {
     `;
 
     // 5. Append to the console
-    systemList.appendChild(logItem);
+    systemList.prepend(logItem);
 
     // 6. Memory Management: Prevent the browser from crashing by keeping only the last 100 logs
     if (systemList.childNodes.length > 100) {
         systemList.removeChild(systemList.firstChild);
     }
 
-    // 7. Auto-scroll to the bottom so the newest log is always visible
-    systemList.scrollTop = systemList.scrollHeight;
+    // 7. Auto-scroll to the top so the newest log is always perfectly visible
+    systemList.scrollTop = 0;
 });
 
 // ==========================================

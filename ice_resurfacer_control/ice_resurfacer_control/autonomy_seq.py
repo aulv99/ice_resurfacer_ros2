@@ -349,7 +349,7 @@ class ZamboniMasterNode(Node):
         self.coverage_percent_pub = self.create_publisher(Float32, '/ice_coverage_percent', 10)
 
         # Grid parameters: 
-        self.grid_res = 0.2
+        self.grid_res = 0.1
         self.grid_width = 60.0
         self.grid_height = 30.0
         self.grid_w = int(self.grid_width / self.grid_res)

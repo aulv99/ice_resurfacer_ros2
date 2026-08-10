@@ -28,6 +28,10 @@ class ConditionerManager(Node):
         self.current_valve_opening = 0.0
         self.current_velocity = 0.0
 
+        # --- Alarm Latch Flags ---
+        self.water_50_warned = False
+        self.fuel_15_warned = False
+
         # --------------------------------
         # Control Loop
         # --------------------------------
@@ -101,13 +105,12 @@ class ConditionerManager(Node):
         if self.current_mission_state == 'PHASE_2' and previous_state != 'PHASE_2':
             self.get_logger().info("Lasketaan jäädytin ja käynnistetään lumikairat.")
             self.set_conditioner_lift(0.2)  # Drop blade
-            # self.set_auger_speed(self.MAX_AUGER_SPEED)
             
         elif self.current_mission_state in ['PHASE_3A', 'IDLE'] and previous_state == 'PHASE_2':
             self.get_logger().info("Nostetaan jäädytin, pysäytetään lumikairat, ja katkaistaan vesisyöttö")
             self.set_conditioner_lift(-0.2) # Lift blade
-            # self.set_auger_speed(0.0)
-            # self.set_water_valve(0.0)
+            self.set_auger_speed(0.0)
+            self.set_water_valve(0.0)
 
     def velocity_callback(self, msg):
         """ Feedforward control for the water valve based on vehicle speed and auger control"""
@@ -177,7 +180,7 @@ class ConditionerManager(Node):
             self.get_logger().info("Vesisäiliön taso 50%")
             self.water_50_warned = True
         
-        if fuel_percentage == 15.0 and not self.fuel_15_warned:
+        if fuel_percentage <= 15.0 and not self.fuel_15_warned:
             self.get_logger().info("Polttoaine lopussa. Tankkaa ajoneuvo.")
             self.fuel_15_warned = True
 
