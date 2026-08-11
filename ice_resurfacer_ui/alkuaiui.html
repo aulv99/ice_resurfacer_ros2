@@ -100,11 +100,44 @@
     </div>
 
     <div id="view-sequence" class="view-section" style="display: none;">
-        <div class="panel operations-panel">
-            <!-- <div style="text-align: center; font-size: 1.1rem; margin-bottom: 20px;">Operation Mode: Auto</div> -->
-            <div class="button-group">
-                <button class="nav-btn" onclick="callOperationService('START')" >Aloita jäänajo</button>
-                <button class="nav-btn" onclick="callOperationService('STOP')" style="background-color: #ff1744; color: #fff;">Pysäytä jäänajo</button>
+        <div class="panel operations-panel" style="max-width: 600px; margin: 0 auto;">
+            
+            <!-- MODE SELECTION -->
+            <div style="text-align: center; font-size: 1.2rem; margin-bottom: 15px; color: #fff;">Ohjaustila</div>
+            <div class="button-group" style="margin-top: 0;">
+                <button id="btn-mode-auto" onclick="setControlMode('AUTO')">Automaatti</button>
+                <button id="btn-mode-manual" class="active-mode" onclick="setControlMode('MANUAL')">Manuaali</button>
+            </div>
+
+            <hr style="border: 1px solid #333; margin: 25px 0;">
+
+            <!-- AUTONOMY CONTROLS -->
+            <div style="text-align: center; font-size: 1.2rem; margin-bottom: 15px;">Automaattiajo</div>
+            <div class="button-group" style="margin-top: 0;">
+                <button id="btn-start" onclick="callOperationService('START')">Aloita jäänajo</button>
+                <!-- Stop button should always be red and always work as an E-STOP! -->
+                <button onclick="callOperationService('STOP')" style="background-color: #8d001c; color: #fff;">Pysäytä jäänajo</button>
+            </div>
+
+            <hr style="border: 1px solid #333; margin: 25px 0;">
+
+            <!-- TELEOP CONTROLS -->
+            <div style="text-align: center; font-size: 1.2rem; margin-bottom: 15px;">Manuaaliajo</div>
+            <div class="teleop-grid">
+                <!-- Top Row (Forward + Turns) -->
+                <button class="teleop-btn" onclick="publishTeleop(1.0, 1.0)">↖</button>
+                <button class="teleop-btn" onclick="publishTeleop(1.0, 0.0)">↑</button>
+                <button class="teleop-btn" onclick="publishTeleop(1.0, -1.0)">↗</button>
+                
+                <!-- Middle Row (Pivot & Stop) -->
+                <button class="teleop-btn" onclick="publishTeleop(0.0, 1.0)">←</button>
+                <button class="teleop-btn" onclick="publishTeleop(0.0, 0.0)" style="background-color: #8d001c; color: #fff;">■</button>
+                <button class="teleop-btn" onclick="publishTeleop(0.0, -1.0)">→</button>
+                
+                <!-- Bottom Row (Reverse + Turns) -->
+                <button class="teleop-btn" onclick="publishTeleop(-1.0, -1.0)">↙</button>
+                <button class="teleop-btn" onclick="publishTeleop(-1.0, 0.0)">↓</button>
+                <button class="teleop-btn" onclick="publishTeleop(-1.0, 1.0)">↘</button>
             </div>
         </div>
     </div>

@@ -131,10 +131,69 @@ ros.on('close', () => {
     document.getElementById('val-nav').style.color = "#888";
 });
 
+// ==========================================
+// CONTROL MODES & TELEOP
+// ==========================================
+let currentControlMode = 'MANUAL'; // Default for safety
+
+// The Teleop Publisher
+const cmdVelPub = new ROSLIB.Topic({
+    ros: ros,
+    name: '/cmd_vel',
+    messageType: 'geometry_msgs/Twist'
+});
+
+function publishTeleop(linear, angular) {
+    if (currentControlMode === 'AUTO') {
+        console.warn("Teleop blocked: System is in AUTO mode.");
+        return;
+    }
+    
+    const twist = new ROSLIB.Message({
+        linear: { x: linear, y: 0.0, z: 0.0 },
+        angular: { x: 0.0, y: 0.0, z: angular }
+    });
+    cmdVelPub.publish(twist);
+}
+
+function setControlMode(mode) {
+    currentControlMode = mode;
+    
+    const btnAuto = document.getElementById('btn-mode-auto');
+    const btnManual = document.getElementById('btn-mode-manual');
+    const btnStart = document.getElementById('btn-start');
+    const teleopBtns = document.querySelectorAll('.teleop-btn');
+
+    if (mode === 'AUTO') {
+        // Highlight Auto, unhighlight Manual
+        btnAuto.classList.add('active-mode');
+        btnManual.classList.remove('active-mode');
+        
+        // Enable Start Sequence button
+        btnStart.disabled = false;
+        btnStart.style.backgroundColor = '#00E676';
+        btnStart.style.color = '#111';
+
+        // Disable all Teleop buttons
+        teleopBtns.forEach(btn => btn.disabled = true);
+        
+    } else if (mode === 'MANUAL') {
+        // Highlight Manual, unhighlight Auto
+        btnManual.classList.add('active-mode');
+        btnAuto.classList.remove('active-mode');
+        
+        // Disable Start Sequence button
+        btnStart.disabled = true;
+        btnStart.style.backgroundColor = ''; // Reset to CSS default
+
+        // Enable all Teleop buttons
+        teleopBtns.forEach(btn => btn.disabled = false);
+    }
+}
+
 // ------------------------------------------
 // ROS 2 Services (Start sequence)
 // ------------------------------------------
-
 const startService = new ROSLIB.Service({
     ros: ros,
     name: '/start_sequence',
@@ -148,21 +207,26 @@ const stopService = new ROSLIB.Service({
 });
 
 function callOperationService(command) {
-    const request = new ROSLIB.ServiceRequest({}); // Trigger services don't need data sent
+    const request = new ROSLIB.ServiceRequest({}); 
 
     if (command === 'START') {
+        // Hard-block in JavaScript just in case the HTML disabled attribute fails
+        if (currentControlMode === 'MANUAL') {
+            alert("Aloitus estetty: Järjestelmä on manuaalitilassa.");
+            return;
+        }
+
         startService.callService(request, (result) => {
             console.log("Start Response:", result);
             if (result.success) {
-                // Optional: Make the UI visually confirm it started
                 document.getElementById('val-op').style.color = "#00E676"; 
             } else {
-                // If the robot refused to start, pop up a browser alert!
                 alert("START FAILED: " + result.message);
             }
         });
     }
     else if (command === 'STOP') {
+        // STOP is universally allowed regardless of mode
         stopService.callService(request, (result) => {
             console.log("Stop Response:", result);
             if (result.success) {
@@ -170,8 +234,18 @@ function callOperationService(command) {
                 alert("ZAMBONI HALTED!");
             }
         });
+        
+        // As a safety measure, force vehicle to 0 velocity immediately
+        if (currentControlMode === 'MANUAL') {
+            publishTeleop(0.0, 0.0);
+        }
     }
 }
+
+// Initialize the UI safely to Manual on boot
+window.onload = () => {
+    setControlMode('MANUAL');
+};
 
 const stateListener = new ROSLIB.Topic({
     ros : ros,
@@ -187,7 +261,8 @@ const stateDict = {
     "PHASE_3A": "3A: Ajetaan pois jäältä",
     "PHASE_3B": "3B: Ajetaan lumentyhjäyspaikalle",
     "PHASE_3C": "3C: Peruutetaan pois lumentyhjäyspaikalta",
-    "PHASE_3D": "3D: Ajetaan takaisin talliin"
+    "PHASE_3D": "3D: Ajetaan takaisin talliin",
+    "HALTED": "Hätäseis"
 };
 
 stateListener.subscribe((message) => {

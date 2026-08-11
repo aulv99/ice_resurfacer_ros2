@@ -423,7 +423,7 @@ class ZamboniMasterNode(Node):
         self.is_running = True
         self.get_logger().info("Jäänajo aloitettu ohjauspaneelista")
         
-        # Triggering the 
+        # Triggering the first phase of sequence
         self.start_phase_1_transit()
         
         response.success = True
@@ -441,8 +441,18 @@ class ZamboniMasterNode(Node):
 
         self.is_running = False
         self.get_logger().warn("Jäänajo keskeytetty")
+        self.set_and_publish_state('HALTED')
         
-        # -> INSERT YOUR CODE HERE to cancel the Nav2 goal and publish 0.0 to cmd_vel
+        # Emergency brake when halting operation
+        brake_msg = Twist()
+        brake_msg.linear.x = 0.0
+        brake_msg.angular.z = 0.0
+        self.cmd_vel_pub.publish(brake_msg)
+
+        # Canceling any active Nav2 goals
+        if hasattr(self, 'nav_goal_handle') and self.nav_goal_handle is not None:
+            self.get_logger().info("Perutaan reitti...")
+            self.nav_goal_handle.cancel_goal_async()
         
         response.success = True
         response.message = "Emergency Stop executed."
@@ -464,7 +474,9 @@ class ZamboniMasterNode(Node):
             "PHASE_3A": "3A: Ajetaan pois jäältä",
             "PHASE_3B": "3B: Ajetaan lumentyhjäyspaikalle",
             "PHASE_3C": "3C: Peruutetaan pois lumentyhjäyspaikalta",
-            "PHASE_3D": "3D: Ajetaan takaisin talliin"
+            "PHASE_3D": "3D: Ajetaan takaisin talliin",
+            "IDLE": "Valmiudessa",
+            "HALTED": "Hätäseis"
         }
 
         state_description = state_dict.get(new_state, new_state)
@@ -482,6 +494,12 @@ class ZamboniMasterNode(Node):
         # ----------------------------------------------------
         # PHASE 2: RESURFACING PURE PURSUIT
         # ----------------------------------------------------
+
+        # When operation is halted, static path planning will not go through
+        if self.mission_state == 'HALTED':
+            return
+
+        # Starting static resurfacing in phase 2
         if self.mission_state == 'PHASE_2':
             # Ask TF2 for the robot position in the MAP frame 
             # This is to ensure that the static plan will be w.r.t to the map frame

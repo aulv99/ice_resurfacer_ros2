@@ -280,6 +280,43 @@ button:active { background-color: #999; }
     animation: fadeIn 0.3s; /* Smooth transition effect */
 }
 
+/* ========================================== */
+/* SEKVENSSI PAGE STYLES */
+/* ========================================== */
+.teleop-grid {
+    display: grid;
+    grid-template-columns: 60px 60px 60px;
+    grid-gap: 10px;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+.teleop-btn {
+    width: 60px;
+    height: 60px;
+    padding: 0;
+    font-size: 1.2rem;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Disabled button state (Grayed out and unclickable) */
+button:disabled {
+    opacity: 0.2;
+    cursor: not-allowed;
+    background-color: #555 !important;
+    color: #888 !important;
+}
+
+/* Active Mode Button Styling */
+.active-mode {
+    background-color: var(--accent-blue) !important;
+    color: #111 !important;
+    border-color: var(--accent-blue) !important;
+}
+
 @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
