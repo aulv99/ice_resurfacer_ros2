@@ -41,11 +41,11 @@ const positionChart = new Chart(ctxPos, {
         responsive: true,
         maintainAspectRatio: false,
         scales: {
-            x: { min: -30, max: 30, title: {display: true, text: 'Kaukalon pituus (m)', color: '#aaaaaa'}, 
+            x: { min: -40, max: 40, title: {display: true, text: 'Kaukalon pituus (m)', color: '#aaaaaa'}, 
             grid: { color: 'rgba(255, 255, 255, 0.1)' }, // Faint white gridlines
             ticks: { color: '#888888' }
             },
-            y: { min: -15, max: 15, title: {display: true, text: 'Kaukalon leveys (m)', color: '#aaaaaa'}, 
+            y: { min: -20, max: 20, title: {display: true, text: 'Kaukalon leveys (m)', color: '#aaaaaa'}, 
             grid: { color: 'rgba(255, 255, 255, 0.1)' }, 
             ticks: { color: '#888888' }
             }
@@ -135,6 +135,7 @@ ros.on('close', () => {
 // CONTROL MODES & TELEOP
 // ==========================================
 let currentControlMode = 'MANUAL'; // Default for safety
+let currentOperationState = 'IDLE';
 
 // The Teleop Publisher
 const cmdVelPub = new ROSLIB.Topic({
@@ -157,6 +158,12 @@ function publishTeleop(linear, angular) {
 }
 
 function setControlMode(mode) {
+    if (mode === 'MANUAL' && currentOperationState !== 'IDLE' && currentOperationState !== 'HALTED') {
+        console.warn("Manual mode locked: Active sequence in progress!");
+        return; 
+    }
+
+
     currentControlMode = mode;
     
     const btnAuto = document.getElementById('btn-mode-auto');
@@ -206,6 +213,12 @@ const stopService = new ROSLIB.Service({
     serviceType: 'std_srvs/srv/Trigger'
 });
 
+const resetService = new ROSLIB.Service({
+    ros: ros,
+    name: '/reset_zamboni',
+    serviceType: 'std_srvs/srv/Trigger',
+});
+
 function callOperationService(command) {
     const request = new ROSLIB.ServiceRequest({}); 
 
@@ -219,7 +232,8 @@ function callOperationService(command) {
         startService.callService(request, (result) => {
             console.log("Start Response:", result);
             if (result.success) {
-                document.getElementById('val-op').style.color = "#00E676"; 
+                document.getElementById('val-op').style.color = "#00E676";
+                alert("Jäänajo aloitettu") 
             } else {
                 alert("START FAILED: " + result.message);
             }
@@ -231,14 +245,25 @@ function callOperationService(command) {
             console.log("Stop Response:", result);
             if (result.success) {
                 document.getElementById('val-op').style.color = "#ff1744"; 
-                alert("ZAMBONI HALTED!");
+                alert("Hätäseis");
             }
         });
         
         // As a safety measure, force vehicle to 0 velocity immediately
-        if (currentControlMode === 'MANUAL') {
-            publishTeleop(0.0, 0.0);
-        }
+        // if (currentControlMode === 'MANUAL') {
+        //     publishTeleop(0.0, 0.0);
+        // }
+
+    }
+    else if (command === 'RESET') {
+        resetService.callService(request, (result) => {
+            console.log("Reset Response:", result);
+            if (result.success) {
+                alert("Järjestelmä nollattu.");
+            } else {
+                alert("Nollaus estetty " + result.message);
+            }
+        });
     }
 }
 
@@ -267,12 +292,46 @@ const stateDict = {
 
 stateListener.subscribe((message) => {
     let operationState = message.data;
-    
+    currentOperationState = operationState;
     // Look up the phase in the dictionary. 
     // The " || 'Virhe' " part is a fallback: if the state isn't found, it defaults to 'Virhe'.
     let operaatio = stateDict[operationState] || "Virhe";
-
     document.getElementById('val-op').innerText = operaatio;
+
+    const btnReset = document.getElementById('btn-reset');
+    const btnManual = document.getElementById('btn-mode-manual');
+    const btnStart = document.getElementById('btn-start');
+
+    // state based safety checks
+    if (btnReset) {
+        if (operationState === 'HALTED') {
+            btnReset.disabled = false;
+            btnReset.style.backgroundColor = '#ffeb3b';
+            btnReset.style.color = '#111';
+        } else {
+            // Lock the button and strip the inline colors (CSS will take over and gray it out)
+            btnReset.disabled = true;
+            btnReset.style.backgroundColor = '';
+        }
+    }
+    if (btnManual) {
+        if (operationState === 'IDLE' || operationState === 'HALTED') {
+            // Unlock manual mode
+            btnManual.disabled = false; 
+            btnManual.title = ""; // Clear tooltip
+        } else {
+            // Sequence is running (Phases 1-3). Lock manual mode!
+            btnManual.disabled = true;
+            btnManual.title = "Pysäytä jäänajo vaihtaaksesi manuaalitilaan"; // Helpful tooltip
+        }
+    }
+    if (btnStart) {
+        if (operationState === 'IDLE') {
+            btnStart.disabled = false;
+        } else {
+            btnStart.disabled = true;
+        }
+    }
 });
 
 const velocityListener = new ROSLIB.Topic({

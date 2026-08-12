@@ -339,6 +339,7 @@ class ZamboniMasterNode(Node):
         # ROS2 Service Server
         self.start_srv = self.create_service(Trigger, '/start_sequence', self.start_callback)
         self.stop_srv = self.create_service(Trigger, '/stop_sequence', self.stop_callback)
+        self.reset_srv = self.create_service(Trigger, '/reset_zamboni', self.reset_callback)
 
         # --- TF2 Listener ---
         self.tf_buffer = Buffer()
@@ -412,13 +413,16 @@ class ZamboniMasterNode(Node):
 
     # start_callback is the service trigger for UI start sequence command
     def start_callback(self, request, response):
-        """ Triggered when the UI presses START """
+        if self.mission_state != 'IDLE':
+            self.get_logger().warn(f"Aloitus estetty. Laitteisto ei ole valmiudessa.")
+            response.success = False
+            response.message = "Virhe: Jääkone ei ole valmiina" 
+            return response
+
         if self.is_running:
             response.success = False
             response.message = "Jäänajo on jo käynnissä"
             return response
-            
-        # Add safety checks here
         
         self.is_running = True
         self.get_logger().info("Jäänajo aloitettu ohjauspaneelista")
@@ -433,7 +437,6 @@ class ZamboniMasterNode(Node):
     # stop_callback is the service trigger for UI stop sequence commmand
     # NOT IN USE
     def stop_callback(self, request, response):
-        """ Triggered when the UI presses STOP """
         if not self.is_running:
             response.success = False
             response.message = "Already stopped."
@@ -457,6 +460,71 @@ class ZamboniMasterNode(Node):
         response.success = True
         response.message = "Emergency Stop executed."
         return response
+
+    def reset_callback(self, request, response):
+        # can be reseted only in halt state
+        if self.mission_state != 'HALTED':
+            response.success = False
+            response.message = "Laitteisto ei ole Hätäseis-tilassa"
+            return response
+
+        # get the current position in the map
+        try: 
+            t = self.tf_buffer.lookup_transform('map', 'base_link', rclpy.time.Time())
+            rx = t.transform.translation.x
+            ry = t.transform.translation.y
+        except Exception as ex:
+            self.get_logger().error(f"Sijaintia ei voida varmistaa: {ex}")
+            response.success = False
+            response.message = "Sijainnin varmistus epäonnistui."
+            return response
+
+        # Garage geofence
+        GARAGE_X_FRONT = -32.0
+        GARAGE_X_BACK  = -38.0
+        GARAGE_Y_RIGHT = -12.0
+        GARAGE_Y_LEFT  = -8.0
+
+        # Checking whether the robot is within garage geofence
+        if GARAGE_X_BACK <= rx <= GARAGE_X_FRONT and GARAGE_Y_RIGHT <= ry <= GARAGE_Y_LEFT:
+            self.get_logger().info("Jääkone on turvallisesti tallissa. Viat kuitattu.")
+
+            # Reseting coverage map
+            self.coverage_reset()
+
+            self.set_and_publish_state('IDLE')
+
+            response.success = True
+            response.message = "Jääkone on nollattu ja valmiudessa"
+        else: 
+            self.get_logger().warn(f"Kuittaus estetty. Jääkone ei ole tallissa")
+            response.success = False
+            response.message = "Siirrä jääkone talliin"
+
+        return response
+
+
+    def coverage_reset(self):
+        # Coverage tracker reset
+        self.coverage_grid.fill(-1)
+        self.coverage_grid[self.rink_mask] = 0
+        pct_msg = Float32()
+        pct_msg.data = 0.0
+        self.coverage_percent_pub.publish(pct_msg)
+
+        # Broadcast the wiped, clean map back to RViz
+        grid_msg = OccupancyGrid()
+        grid_msg.header.stamp = self.get_clock().now().to_msg()
+        grid_msg.header.frame_id = 'map'
+        grid_msg.info.resolution = self.grid_res
+        grid_msg.info.width = self.grid_w
+        grid_msg.info.height = self.grid_h
+        grid_msg.info.origin.position.x = float(self.grid_origin_x)
+        grid_msg.info.origin.position.y = float(self.grid_origin_y)
+        
+        grid_msg.data = self.coverage_grid.flatten().tolist()
+        self.coverage_pub.publish(grid_msg)
+
 
     # set_and_publish_state updates the robot's current status (e.g., "IDLE" or "RESURFACING") 
     # and broadcasts it to the ROS network so the UI can display it.
@@ -685,6 +753,9 @@ class ZamboniMasterNode(Node):
             self.get_logger().error('Phase 1A Goal Rejected!')
             self.set_and_publish_state('IDLE')
             return
+
+        self.nav_goal_handle = goal_handle
+        
         get_result_future = goal_handle.get_result_async()
         get_result_future.add_done_callback(self._transit_1a_result_callback)
 
@@ -718,6 +789,9 @@ class ZamboniMasterNode(Node):
         if not goal_handle.accepted:
             self.set_and_publish_state('IDLE')
             return
+
+        self.nav_goal_handle = goal_handle
+        
         get_result_future = goal_handle.get_result_async()
         get_result_future.add_done_callback(self._transit_1b_result_callback)
 
@@ -801,6 +875,9 @@ class ZamboniMasterNode(Node):
         if not goal_handle.accepted:
             self.get_logger().error('Exit goal rejected by Nav2!')
             return
+
+        self.nav_goal_handle = goal_handle
+        
         get_result_future = goal_handle.get_result_async()
         get_result_future.add_done_callback(self._exit_result_3a_callback)
 
@@ -836,6 +913,9 @@ class ZamboniMasterNode(Node):
         if not goal_handle.accepted:
             self.get_logger().error('Exit goal rejected by Nav2!')
             return
+
+        self.nav_goal_handle = goal_handle
+        
         get_result_future = goal_handle.get_result_async()
         get_result_future.add_done_callback(self._exit_result_3b_callback)
 
@@ -854,7 +934,7 @@ class ZamboniMasterNode(Node):
         self.get_logger().info(f'Vaihe 3C: Peruutetaan ulos lumikasalta')
 
     # ============================================================
-    # PHASE 3C: FINAL PARK IN GARAGE
+    # PHASE 3D: FINAL PARK IN GARAGE
     # ============================================================
     def start_exit_maneuver_3d(self):
         self.get_logger().info('Vaihe 3D. Ajetaan takaisin talliin')
@@ -878,6 +958,9 @@ class ZamboniMasterNode(Node):
         if not goal_handle.accepted:
             self.get_logger().error('Parking goal rejected by Nav2!')
             return
+
+        self.nav_goal_handle = goal_handle
+        
         get_result_future = goal_handle.get_result_async()
         get_result_future.add_done_callback(self._exit_result_3d_callback)
 
@@ -889,24 +972,7 @@ class ZamboniMasterNode(Node):
             self.get_logger().info('Vaihe 3D Valmis. Jää on ajettu ja jääkone tallissa')
 
             # Coverage tracker reset
-            self.coverage_grid.fill(-1)
-            self.coverage_grid[self.rink_mask] = 0
-            pct_msg = Float32()
-            pct_msg.data = 0.0
-            self.coverage_percent_pub.publish(pct_msg)
-
-            # Broadcast the wiped, clean map back to RViz
-            grid_msg = OccupancyGrid()
-            grid_msg.header.stamp = self.get_clock().now().to_msg()
-            grid_msg.header.frame_id = 'map'
-            grid_msg.info.resolution = self.grid_res
-            grid_msg.info.width = self.grid_w
-            grid_msg.info.height = self.grid_h
-            grid_msg.info.origin.position.x = float(self.grid_origin_x)
-            grid_msg.info.origin.position.y = float(self.grid_origin_y)
-            
-            grid_msg.data = self.coverage_grid.flatten().tolist()
-            self.coverage_pub.publish(grid_msg)
+            self.coverage_reset()
 
 def main(args=None):
     rclpy.init(args=args)
