@@ -4,6 +4,7 @@ from sensor_msgs.msg import LaserScan
 import tf2_ros
 import numpy as np
 import math
+from std_msgs.msg import String
 
 class ObstacleDetection(Node):
     def __init__(self):
@@ -31,8 +32,13 @@ class ObstacleDetection(Node):
         # Subscribers
         self.scan_sub = self.create_subscription(LaserScan, '/scan', self.scan_callback, 10)
 
+        # publishers
+        self.safety_pub = self.create_publisher(String, '/safety_status', 10)
+
         # Tracking current warning state
         self.current_alert_level = 'CLEAR'
+        self.previous_mission_state = None
+        self.current_safety_status = 'CLEAR'
 
         self.get_logger().info("Obstacle Monitor Active.")
 
@@ -51,6 +57,19 @@ class ObstacleDetection(Node):
         x_trans = x_array * math.cos(yaw) - y_array * math.sin(yaw) + tx
         y_trans = x_array * math.sin(yaw) + y_array * math.cos(yaw) + ty
         return x_trans, y_trans
+
+    def publish_status(self, status):
+        if self.current_alert_level != status:
+            self.current_alert_level = status
+            msg = String()
+            msg.data = status
+            self.safety_pub.publish(msg)
+            if status == 'STOP':
+                self.get_logger().error("Safety Status: STOP")
+            elif status == 'CAUTION':
+                self.get_logger().warn("Safety Status: CAUTION")
+            else:
+                self.get_logger().info("Safety Status: CLEAR")
 
     def scan_callback(self, msg):
         # get the offset between the physical lidar and the robots pivot point
@@ -106,6 +125,7 @@ class ObstacleDetection(Node):
         if np.any(stop_mask):
             if self.current_alert_level != 'STOP':
                 self.get_logger().error("Este pysähtymisalueella.")
+                self.publish_status('STOP')
                 self.current_alert_level = 'STOP'
             return
 
@@ -114,6 +134,7 @@ class ObstacleDetection(Node):
         if np.any(caution_mask):
             if self.current_alert_level != 'CAUTION':
                 self.get_logger().warn("Este varoalueella.")
+                self.publish_status('CAUTION')
                 self.current_alert_level = 'CAUTION'
 
             return
@@ -121,6 +142,7 @@ class ObstacleDetection(Node):
         # Path clear
         if self.current_alert_level != 'CLEAR':
             self.get_logger().info("Reitti vapaa.")
+            self.publish_status('CLEAR')
             self.current_alert_level = 'CLEAR'
 
 def main(args=None):
