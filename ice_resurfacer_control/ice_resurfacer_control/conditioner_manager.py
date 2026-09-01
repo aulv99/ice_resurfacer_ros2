@@ -106,7 +106,7 @@ class ConditionerManager(Node):
             self.get_logger().info("Lasketaan jäädytin ja käynnistetään lumikairat.")
             self.set_conditioner_lift(0.2)  # Drop blade
             
-        elif self.current_mission_state in ['PHASE_3A', 'IDLE', 'HALTED'] and previous_state == 'PHASE_2':
+        elif self.current_mission_state in ['PHASE_3A', 'IDLE', 'HALTED', 'PAUSED'] and previous_state == 'PHASE_2':
             self.get_logger().info("Nostetaan jäädytin, pysäytetään lumikairat, ja katkaistaan vesisyöttö")
             self.set_conditioner_lift(-0.2) # Lift blade
             self.set_auger_speed(0.0)
@@ -129,6 +129,7 @@ class ConditionerManager(Node):
         else:
             self.set_water_valve(0.0)
             self.set_auger_speed(0.0)
+
     # ============================================================
     # HARDWARE COMMAND HELPERS
     # ============================================================

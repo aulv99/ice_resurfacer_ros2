@@ -340,6 +340,8 @@ class ZamboniMasterNode(Node):
         self.start_srv = self.create_service(Trigger, '/start_sequence', self.start_callback)
         self.stop_srv = self.create_service(Trigger, '/stop_sequence', self.stop_callback)
         self.reset_srv = self.create_service(Trigger, '/reset_zamboni', self.reset_callback)
+        self.pause_srv = self.create_service(Trigger, '/pause_sequence', self.pause_callback)
+        self.resume_srv = self.create_service(Trigger, '/resume_sequence', self.resume_callback)
 
         # --- TF2 Listener ---
         self.tf_buffer = Buffer()
@@ -411,6 +413,14 @@ class ZamboniMasterNode(Node):
             qos_profile_sensor_data
         )
 
+        self.safety_sub = self.create_subscription(
+            String,
+            '/safety_status',
+            self.safety_status_callback,
+            10
+        )
+        self.current_safety_status = 'CLEAR'
+
     # start_callback is the service trigger for UI start sequence command
     def start_callback(self, request, response):
         if self.mission_state != 'IDLE':
@@ -435,7 +445,6 @@ class ZamboniMasterNode(Node):
         return response
 
     # stop_callback is the service trigger for UI stop sequence commmand
-    # NOT IN USE
     def stop_callback(self, request, response):
         if not self.is_running:
             response.success = False
@@ -503,6 +512,57 @@ class ZamboniMasterNode(Node):
 
         return response
 
+    def pause_callback(self, request, response):
+        if self.mission_state in ['IDLE', 'HALTED', 'PAUSED']:
+            response.success = False
+            response.message = f"Cannot pause from current state: {self.mission_state}"
+            return response
+
+        self.previous_mission_state = self.mission_state
+        self.mission_state = 'PAUSED'
+
+        self.publish_zero_velocity()
+
+        self.get_logger().warn("Sekvenssi pysäytetty")
+        response.success = True
+        response.message = "Sekvenssi pysäytetty onnistuneesti"
+        return response
+
+    def resume_callback(self, request, response):
+        if self.mission_state != 'PAUSED':
+            response.success = False
+            response.message = f"Ei voida pysäyttää. Sekvenssi ei ole PAUSED-tilassa"
+            return response
+
+        restored_state = self.previous_mission_state
+        self.previous_mission_state = None
+
+        self.set_and_publish_state(restored_state)
+
+        self.get_logger().info(f"Sekvenssi palautettu. Jatketaan jäänajoa.")
+        response.success = True
+        response.message = "Sekvenssiä jatkettu"
+        return response
+
+    def publish_zero_velocity(self):
+        stop_msg = Twist()
+
+        # command zero velocity
+        stop_msg.linear.x = 0.0
+        stop_msg.angular.z = 0.0
+
+        self.cmd_vel_pub.publish(stop_msg)
+        self.get_logger().info("Jääkone pysäytetty")
+
+    def safety_status_callback(self, msg):
+        self.current_safety_status = msg.data
+
+        if msg.data == 'STOP' and self.mission_state == 'PHASE_2':
+            self.get_logger().error("Este havaittu. Automaattinen pysäytys")
+
+            self.previous_mission_state = self.mission_state
+            self.set_and_publish_state('PAUSED')
+            self.publish_zero_velocity
 
     def coverage_reset(self):
         # Coverage tracker reset
@@ -544,7 +604,8 @@ class ZamboniMasterNode(Node):
             "PHASE_3C": "3C: Peruutetaan pois lumentyhjäyspaikalta",
             "PHASE_3D": "3D: Ajetaan takaisin talliin",
             "IDLE": "Valmiudessa",
-            "HALTED": "Hätäseis"
+            "HALTED": "Hätäseis",
+            "PAUSED": "Tauko"
         }
 
         state_description = state_dict.get(new_state, new_state)

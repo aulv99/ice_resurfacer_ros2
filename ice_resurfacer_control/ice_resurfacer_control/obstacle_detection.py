@@ -37,7 +37,6 @@ class ObstacleDetection(Node):
 
         # Tracking current warning state
         self.current_alert_level = 'CLEAR'
-        self.previous_mission_state = None
         self.current_safety_status = 'CLEAR'
 
         self.get_logger().info("Obstacle Monitor Active.")
@@ -123,27 +122,17 @@ class ObstacleDetection(Node):
         # Check stop zone
         stop_mask = in_path_mask & forward_mask & (x_base <= stop_x) & on_ice_mask
         if np.any(stop_mask):
-            if self.current_alert_level != 'STOP':
-                self.get_logger().error("Este pysähtymisalueella.")
-                self.publish_status('STOP')
-                self.current_alert_level = 'STOP'
+            self.publish_status('STOP')
             return
 
         # Check caution zone
         caution_mask = in_path_mask & forward_mask & (x_base > stop_x) & (x_base <= caution_x) & on_ice_mask
         if np.any(caution_mask):
-            if self.current_alert_level != 'CAUTION':
-                self.get_logger().warn("Este varoalueella.")
-                self.publish_status('CAUTION')
-                self.current_alert_level = 'CAUTION'
-
+            self.publish_status('CAUTION')
             return
 
         # Path clear
-        if self.current_alert_level != 'CLEAR':
-            self.get_logger().info("Reitti vapaa.")
-            self.publish_status('CLEAR')
-            self.current_alert_level = 'CLEAR'
+        self.publish_status('CLEAR')
 
 def main(args=None):
         rclpy.init(args= args)

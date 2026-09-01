@@ -27,8 +27,16 @@ def generate_launch_description():
         output='screen' # Prints your Phase tracking to the terminal
     )
 
+    safety_node = Node(
+        package='ice_resurfacer_control', 
+        executable='obstacle_detection_node', 
+        name='obstacle_detection',
+        output='screen' 
+    )
+
     return LaunchDescription([
         bridge_node,
         conditioner_node,
-        autonomy_node
+        autonomy_node,
+        safety_node
     ])

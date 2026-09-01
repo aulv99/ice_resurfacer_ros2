@@ -30,6 +30,7 @@ setup(
             'autonomy_node = ice_resurfacer_control.autonomy_seq:main',
             'conditioner_node = ice_resurfacer_control.conditioner_manager:main',
             'drive_bridge_node = ice_resurfacer_control.drive_bridge:main',
+            'obstacle_detection_node = ice_resurfacer_control.obstacle_detection.py:main'
         ],
     },
 )
