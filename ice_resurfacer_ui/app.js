@@ -219,6 +219,18 @@ const resetService = new ROSLIB.Service({
     serviceType: 'std_srvs/srv/Trigger',
 });
 
+const pauseService = new ROSLIB.Service({
+    ros: ros,
+    name: '/pause_sequence',
+    serviceType: 'std_srvs/srv/Trigger'
+});
+
+const resumeService = new ROSLIB.Service({
+    ros: ros,
+    name: '/resume_sequence',
+    serviceType: 'std_srvs/srv/Trigger'
+});
+
 function callOperationService(command) {
     const request = new ROSLIB.ServiceRequest({}); 
 
@@ -265,6 +277,27 @@ function callOperationService(command) {
             }
         });
     }
+    else if (command === 'PAUSE') {
+        pauseService.callService(request, (result) => {
+            console.log("Pause Response:", result);
+            if (result.success) {
+                alert("Jäänajo keskeytetty");
+            } else {
+                alert("Tauko estetty: " + result.message);
+            }
+        });
+    }
+    else if(command === 'RESUME') {
+        resumeService.callService(request, (result) =>{
+            console.log("REsume Response:", result);
+            if (result.success) {
+                document.getElementById('val-op').style.color = "#00E676";
+                alert("Jäänajo jatkuu");
+            } else {
+                alert("Jatkaminen estetty: " + result.message);
+            }
+        });
+    }
 }
 
 // Initialize the UI safely to Manual on boot
@@ -287,7 +320,8 @@ const stateDict = {
     "PHASE_3B": "3B: Ajetaan lumentyhjäyspaikalle",
     "PHASE_3C": "3C: Peruutetaan pois lumentyhjäyspaikalta",
     "PHASE_3D": "3D: Ajetaan takaisin talliin",
-    "HALTED": "Hätäseis"
+    "HALTED": "Hätäseis",
+    "PAUSED": "Tauko"
 };
 
 stateListener.subscribe((message) => {
@@ -301,6 +335,8 @@ stateListener.subscribe((message) => {
     const btnReset = document.getElementById('btn-reset');
     const btnManual = document.getElementById('btn-mode-manual');
     const btnStart = document.getElementById('btn-start');
+    const btnPause = document.getElementById('btn-pause');
+    const btnResume = document.getElementById('btn-resume');
 
     // state based safety checks
     if (btnReset) {
@@ -330,6 +366,31 @@ stateListener.subscribe((message) => {
             btnStart.disabled = false;
         } else {
             btnStart.disabled = true;
+        }
+    }
+
+    // PAUSE & RESUME LOGIC
+    if (btnPause && btnResume) {
+        if (operationState === 'PAUSED') {
+            // Hide Pause, Show Resume
+            btnPause.style.display = 'none';
+            btnResume.style.display = 'inline-block';
+            btnResume.disabled = false;
+        } else {
+            // Show Pause, Hide Resume
+            btnResume.style.display = 'none';
+            btnPause.style.display = 'inline-block';
+            
+            // Disable Pause if IDLE or HALTED
+            if (operationState === 'IDLE' || operationState === 'HALTED') {
+                btnPause.disabled = true;
+                btnPause.style.backgroundColor = ''; // Use CSS default gray
+            } else {
+                // Enable Pause during active sequence (Phases 1-3)
+                btnPause.disabled = false;
+                btnPause.style.backgroundColor = '#ffb300'; // Amber warning color
+                btnPause.style.color = '#111';
+            }
         }
     }
 });

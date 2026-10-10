@@ -519,7 +519,7 @@ class ZamboniMasterNode(Node):
             return response
 
         self.previous_mission_state = self.mission_state
-        self.mission_state = 'PAUSED'
+        self.set_and_publish_state('PAUSED')
 
         self.publish_zero_velocity()
 
@@ -562,7 +562,7 @@ class ZamboniMasterNode(Node):
 
             self.previous_mission_state = self.mission_state
             self.set_and_publish_state('PAUSED')
-            self.publish_zero_velocity
+            self.publish_zero_velocity()
 
     def coverage_reset(self):
         # Coverage tracker reset
@@ -625,7 +625,7 @@ class ZamboniMasterNode(Node):
         # ----------------------------------------------------
 
         # When operation is halted, static path planning will not go through
-        if self.mission_state == 'HALTED':
+        if self.mission_state in ['HALTED', 'PAUSED']:
             return
 
         # Starting static resurfacing in phase 2

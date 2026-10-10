@@ -115,6 +115,9 @@
             <div style="text-align: center; font-size: 1.2rem; margin-bottom: 15px;">Automaattiajo</div>
             <div class="button-group" style="margin-top: 0;">
                 <button id="btn-start" onclick="callOperationService('START')">Aloita jäänajo</button>
+                <!-- NEW PAUSE AND RESUME BUTTONS -->
+                <button id="btn-pause" onclick="callOperationService('PAUSE')" disabled>Tauko</button>
+                <button id="btn-resume" onclick="callOperationService('RESUME')" style="display: none; background-color: #00E676; color: #111;">Jatka</button>
                 <!-- Stop button should always be red and always work as an E-STOP! -->
                 <button onclick="callOperationService('STOP')" style="background-color: #8d001c; color: #fff;">Pysäytä jäänajo</button>
                 <button id="btn-reset" onclick="callOperationService('RESET')" disabled>Nollaa tila</button>
