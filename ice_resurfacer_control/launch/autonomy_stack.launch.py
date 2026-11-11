@@ -34,9 +34,28 @@ def generate_launch_description():
         output='screen' 
     )
 
+    camera_bridge_node = Node(
+        package='ros_gz_bridge',
+        executable='parameter_bridge',
+        arguments=[
+            '/camera/image_raw@sensor_msgs/msg/Image[gz.msgs.Image',
+            '/camera/camera_info@sensor_msgs/msg/CameraInfo[gz.msgs.CameraInfo'
+        ],
+        output='screen'
+    )
+
+    vision_layer_node = Node(
+        package='ice_resurfacer_control',
+        executable='vision_node',
+        name='yolo_vision',
+        output='screen'
+    )
+
     return LaunchDescription([
         bridge_node,
         conditioner_node,
         autonomy_node,
-        safety_node
+        safety_node,
+        camera_bridge_node,
+        vision_layer_node
     ])

@@ -241,6 +241,16 @@
     <xacro:cylinder_inertia m="1.0" r="0.05" h="0.1"/>
   </link>
 
+  <link name="camera_link">
+  <!-- Visual and collision geometry for a small box -->
+  </link>
+
+  <joint name="camera_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="camera_link"/>
+    <origin xyz="2.0 0.0 1.5" rpy="0 0 0"/> <!-- Positioned high on the front -->
+  </joint>
+
   <joint name="laser_joint" type="fixed">
     <parent link="base_link"/>
     <child link="laser_link"/>
@@ -403,6 +413,27 @@
       <visualize>true</visualize>
       <topic>imu</topic>
       <gz_frame_id>imu_link</gz_frame_id>
+    </sensor>
+  </gazebo>
+
+  <gazebo reference="camera_link">
+    <sensor name="front_camera" type="camera">
+      <always_on>true</always_on>
+      <visualize>true</visualize>
+      <update_rate>5.0</update_rate>
+      <topic>/camera/image_raw</topic>
+      <camera>
+        <horizontal_fov>1.3962634</horizontal_fov>
+        <image>
+          <width>640</width>
+          <height>480</height>
+          <format>R8G8B8</format>
+        </image>
+        <clip>
+          <near>0.02</near>
+          <far>300</far>
+        </clip>
+      </camera>
     </sensor>
   </gazebo>
 
