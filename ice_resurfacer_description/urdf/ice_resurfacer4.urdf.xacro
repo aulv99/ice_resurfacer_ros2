@@ -420,7 +420,7 @@
     <sensor name="front_camera" type="camera">
       <always_on>true</always_on>
       <visualize>true</visualize>
-      <update_rate>5.0</update_rate>
+      <update_rate>10.0</update_rate>
       <topic>/camera/image_raw</topic>
       <camera>
         <horizontal_fov>1.3962634</horizontal_fov>
@@ -441,7 +441,7 @@
     <sensor name="lidar" type="gpu_lidar"> 
       <always_on>true</always_on>
       <visualize>true</visualize>
-      <update_rate>10</update_rate> 
+      <update_rate>15</update_rate> 
       <topic>scan</topic>
       <gz_frame_id>laser_link</gz_frame_id>
       

@@ -15,11 +15,11 @@ class ObstacleDetection(Node):
         self.front_bumper = 2.5
 
         # Safety areas
-        self.stop_distance = 1.5 # hard stop when obstacle 1.5 meters ahead
-        self.caution_distance = 3.0 # slow down when obstacle 3.0 meters ahead
+        self.stop_distance = 2.5 # hard stop when obstacle 1.5 meters ahead
+        self.caution_distance = 5.0 # slow down when obstacle 3.0 meters ahead
 
         # Rink Geometry
-        self.board_margin = 0.1
+        self.board_margin = 0.2
         self.rink_half_length = 30.0 - self.board_margin
         self.rink_half_width = 15.0 - self.board_margin
         self.corner_radius = 8.5
