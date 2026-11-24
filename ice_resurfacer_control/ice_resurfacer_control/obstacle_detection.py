@@ -11,12 +11,12 @@ class ObstacleDetection(Node):
         super().__init__('obstacle_detection')
 
         # Zamboni dimensions
-        self.half_width = 1.06 # around half of 2.13
+        self.half_width = 1.065 # half of 2.13
         self.front_bumper = 2.5
 
         # Safety areas
-        self.stop_distance = 2.5 # hard stop when obstacle 1.5 meters ahead
-        self.caution_distance = 5.0 # slow down when obstacle 3.0 meters ahead
+        self.stop_distance = 3.0 # hard stop when obstacle 1.5 meters ahead
+        self.caution_distance = 6.0 # slow down when obstacle 3.0 meters ahead
 
         # Rink Geometry
         self.board_margin = 0.2

@@ -331,7 +331,7 @@ class ZamboniMasterNode(Node):
         # --- Action Clients & Publishers ---
         self._nav_to_pose_client = ActionClient(self, NavigateToPose, 'navigate_to_pose')
         self.cmd_vel_pub = self.create_publisher(Twist, '/cmd_vel', 10)
-        self._nav_to_pose_client = ActionClient(self, NavigateToPose, 'navigate_to_pose')
+        # self._nav_to_pose_client = ActionClient(self, NavigateToPose, 'navigate_to_pose')
         # self._conditioner_client = ActionClient(self, FollowJointTrajectory, '/conditioner_controller/follow_joint_trajectory')
         self.state_pub = self.create_publisher(String, '/mission_state', 10)
         self.rviz_path_pub = self.create_publisher(Path, '/zamboni_static_path', 10) # Publisher for static trajectory
@@ -400,7 +400,10 @@ class ZamboniMasterNode(Node):
         self.is_running = False
         
         # --- State Tracking ---
-        self.mission_state = 'IDLE'  
+        self.mission_state = 'IDLE'
+        self.previous_mission_state = None
+        self.nav_goal_handle = None
+        self.delay_timer = None
         self.current_path_index = 0
         self.path_x = []
         self.path_y = []
@@ -444,7 +447,7 @@ class ZamboniMasterNode(Node):
         response.message = "Sequence started successfully."
         return response
 
-    # stop_callback is the service trigger for UI stop sequence commmand
+    # stop_callback is the service trigger for UI stop sequence command
     def stop_callback(self, request, response):
         if not self.is_running:
             response.success = False
@@ -454,17 +457,20 @@ class ZamboniMasterNode(Node):
         self.is_running = False
         self.get_logger().warn("Jäänajo keskeytetty")
         self.set_and_publish_state('HALTED')
-        
-        # Emergency brake when halting operation
-        brake_msg = Twist()
-        brake_msg.linear.x = 0.0
-        brake_msg.angular.z = 0.0
-        self.cmd_vel_pub.publish(brake_msg)
 
-        # Canceling any active Nav2 goals
-        if hasattr(self, 'nav_goal_handle') and self.nav_goal_handle is not None:
+        # Cancel snow dump timer if active
+        if self.delay_timer is not None:
+            self.delay_timer.cancel()
+            self.delay_timer = None
+
+        # Cancel any active Nav2 goals
+        if self.nav_goal_handle is not None:
             self.get_logger().info("Perutaan reitti...")
             self.nav_goal_handle.cancel_goal_async()
+            self.nav_goal_handle = None
+
+        # Emergency brake when halting operation
+        self.publish_zero_velocity()
         
         response.success = True
         response.message = "Emergency Stop executed."
@@ -521,6 +527,17 @@ class ZamboniMasterNode(Node):
         self.previous_mission_state = self.mission_state
         self.set_and_publish_state('PAUSED')
 
+        # Cancel snow dump wait timer if paused during Phase 3B unload
+        if self.delay_timer is not None:
+            self.delay_timer.cancel()
+            self.delay_timer = None
+
+        # Cancel active Nav2 dynamic planner goal
+        if self.nav_goal_handle is not None:
+            self.get_logger().info("Perutaan aktiivinen Nav2-tavoite tauon ajaksi...")
+            self.nav_goal_handle.cancel_goal_async()
+            self.nav_goal_handle = None
+
         self.publish_zero_velocity()
 
         self.get_logger().warn("Sekvenssi pysäytetty")
@@ -531,15 +548,28 @@ class ZamboniMasterNode(Node):
     def resume_callback(self, request, response):
         if self.mission_state != 'PAUSED':
             response.success = False
-            response.message = f"Ei voida pysäyttää. Sekvenssi ei ole PAUSED-tilassa"
+            response.message = "Ei voida jatkaa. Sekvenssi ei ole PAUSED-tilassa"
             return response
 
         restored_state = self.previous_mission_state
         self.previous_mission_state = None
 
-        self.set_and_publish_state(restored_state)
+        # Re-dispatch Nav2 goals if we paused during a dynamic planner phase
+        nav_phase_handlers = {
+            'PHASE_1A': self.start_phase_1_transit,
+            'PHASE_1B': self.start_phase_1b_staging,
+            'PHASE_3A': self.start_exit_maneuver_3a,
+            'PHASE_3B': self.start_exit_maneuver_3b,
+            'PHASE_3D': self.start_exit_maneuver_3d,
+        }
 
-        self.get_logger().info(f"Sekvenssi palautettu. Jatketaan jäänajoa.")
+        if restored_state in nav_phase_handlers:
+            nav_phase_handlers[restored_state]()
+        else:
+            # PHASE_2 and PHASE_3C resume automatically via odom_callback
+            self.set_and_publish_state(restored_state)
+
+        self.get_logger().info(f"Sekvenssi palautettu ({restored_state}). Jatketaan jäänajoa.")
         response.success = True
         response.message = "Sekvenssiä jatkettu"
         return response
@@ -815,12 +845,20 @@ class ZamboniMasterNode(Node):
             self.set_and_publish_state('IDLE')
             return
 
+        if self.mission_state in ['PAUSED', 'HALTED']:
+            goal_handle.cancel_goal_async()
+            return
+
         self.nav_goal_handle = goal_handle
         
         get_result_future = goal_handle.get_result_async()
         get_result_future.add_done_callback(self._transit_1a_result_callback)
 
     def _transit_1a_result_callback(self, future):
+        self.nav_goal_handle = None
+        if self.mission_state in ['PAUSED', 'HALTED']:
+            return
+
         result = future.result()
         if result.status == GoalStatus.STATUS_SUCCEEDED:
             self.get_logger().info('Jääkone jäällä. Siirrytään 1B vaiheeseen')
@@ -851,12 +889,20 @@ class ZamboniMasterNode(Node):
             self.set_and_publish_state('IDLE')
             return
 
+        if self.mission_state in ['PAUSED', 'HALTED']:
+            goal_handle.cancel_goal_async()
+            return
+
         self.nav_goal_handle = goal_handle
         
         get_result_future = goal_handle.get_result_async()
         get_result_future.add_done_callback(self._transit_1b_result_callback)
 
     def _transit_1b_result_callback(self, future):
+        self.nav_goal_handle = None
+        if self.mission_state in ['PAUSED', 'HALTED']:
+            return
+
         result = future.result()
         if result.status == GoalStatus.STATUS_SUCCEEDED:
             self.get_logger().info('Vaihe 1B valmis. Valmistaudutaan jäänajoon...')
@@ -937,12 +983,20 @@ class ZamboniMasterNode(Node):
             self.get_logger().error('Exit goal rejected by Nav2!')
             return
 
+        if self.mission_state in ['PAUSED', 'HALTED']:
+            goal_handle.cancel_goal_async()
+            return
+
         self.nav_goal_handle = goal_handle
         
         get_result_future = goal_handle.get_result_async()
         get_result_future.add_done_callback(self._exit_result_3a_callback)
 
     def _exit_result_3a_callback(self, future):
+        self.nav_goal_handle = None
+        if self.mission_state in ['PAUSED', 'HALTED']:
+            return
+
         result = future.result()
         if result.status == GoalStatus.STATUS_SUCCEEDED:
             self.get_logger().info('Vaihe 3A valmis. Jääkone on tallissa')
@@ -975,12 +1029,20 @@ class ZamboniMasterNode(Node):
             self.get_logger().error('Exit goal rejected by Nav2!')
             return
 
+        if self.mission_state in ['PAUSED', 'HALTED']:
+            goal_handle.cancel_goal_async()
+            return
+
         self.nav_goal_handle = goal_handle
         
         get_result_future = goal_handle.get_result_async()
         get_result_future.add_done_callback(self._exit_result_3b_callback)
 
     def _exit_result_3b_callback(self, future):
+        self.nav_goal_handle = None
+        if self.mission_state in ['PAUSED', 'HALTED']:
+            return
+
         result = future.result()
         if result.status == GoalStatus.STATUS_SUCCEEDED:
             self.get_logger().info('Vaihe 3B valmis. Tyhjennetään lumisäiliötä')
@@ -988,11 +1050,15 @@ class ZamboniMasterNode(Node):
             self.delay_timer = self.create_timer(5.0, self._trigger_manual_reverse)
 
     def _trigger_manual_reverse(self):
-        self.delay_timer.cancel()
+        if self.delay_timer is not None:
+            self.delay_timer.cancel()
+            self.delay_timer = None
+        if self.mission_state in ['PAUSED', 'HALTED']:
+            return
+
         self.get_logger().info('Lumisäiliö tyhjennetty. Peruutetaan ja käännetään jääkone')
-        # This unlocks the odom_callback's Phase 3 block!
         self.set_and_publish_state('PHASE_3C')
-        self.get_logger().info(f'Vaihe 3C: Peruutetaan ulos lumikasalta')
+        self.get_logger().info('Vaihe 3C: Peruutetaan ulos lumikasalta')
 
     # ============================================================
     # PHASE 3D: FINAL PARK IN GARAGE
@@ -1020,12 +1086,20 @@ class ZamboniMasterNode(Node):
             self.get_logger().error('Parking goal rejected by Nav2!')
             return
 
+        if self.mission_state in ['PAUSED', 'HALTED']:
+            goal_handle.cancel_goal_async()
+            return
+
         self.nav_goal_handle = goal_handle
         
         get_result_future = goal_handle.get_result_async()
         get_result_future.add_done_callback(self._exit_result_3d_callback)
 
     def _exit_result_3d_callback(self, future):
+        self.nav_goal_handle = None
+        if self.mission_state in ['PAUSED', 'HALTED']:
+            return
+
         result = future.result()
         if result.status == GoalStatus.STATUS_SUCCEEDED:
             self.set_and_publish_state('IDLE')
